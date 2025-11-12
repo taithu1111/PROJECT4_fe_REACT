@@ -77,21 +77,23 @@ export const getUser = (jwt) => async (dispatch) => {
   dispatch(getUserRequest());
 
   try {
-    const response = await axios.get(
-      `http://localhost:1303/api/customers/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/users/profile`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
     const user = response.data;
-    // console.log("user", user);
+    console.log("User profile từ BE:", user);
     dispatch(getUserSuccess(user));
   } catch (error) {
-    dispatch(getUserFailure(error.message));
+    console.error("Lỗi khi gọi getUser:", error.response || error.message);
+    const message =
+      error.response?.data?.message || "Không thể lấy thông tin người dùng.";
+    dispatch(getUserFailure(message));
   }
 };
+
 
 export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT, payload: null });
