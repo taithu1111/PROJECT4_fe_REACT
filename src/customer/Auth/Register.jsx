@@ -50,6 +50,7 @@ const Register = () => {
         alert(message || "Đăng ký thành công! Vui lòng đăng nhập."); // hiện alert
         navigate("/login"); // chuyển sang trang login ngay
       } catch (error) {
+
         alert("Đăng ký thất bại: " + error.message);
       }
     }

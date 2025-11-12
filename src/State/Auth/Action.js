@@ -27,14 +27,19 @@ export const register = (userData) => async (dispatch) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
     const user = response.data;
-    if (user.jwt) {
-      localStorage.setItem("jwt", user.jwt);
+    if (user.token) {
+      localStorage.setItem("jwt", user.token);
     }
-    dispatch(registerSuccess(user.jwt));
+    console.log("user", user);
+    dispatch(registerSuccess(user.token));
     return user.message;
   } catch (error) {
-    dispatch(registerFailure(error.message));
-    throw error;
+    console.log("Lỗi sever : ", error.response);
+    const message =
+      error.response?.data?.message || error.message;
+
+    dispatch(registerFailure(message));
+    throw new Error(message);
   }
 };
 
@@ -49,12 +54,18 @@ export const login = (userData) => async (dispatch) => {
     const response = await axios.post(`${API_BASE_URL}/auth/signin`, userData);
     const user = response.data;
     if (user.token) {
-      localStorage.setItem("jwt", user.jwt);
+      localStorage.setItem("jwt", user.token);
     }
-    // console.log("user", user);
-    dispatch(loginSuccess(user.jwt));
+    console.log("user", user);
+    dispatch(loginSuccess(user.token));
   } catch (error) {
-    dispatch(loginFailure(error.message));
+    const message =
+      error.response?.data?.message || error.message;
+    dispatch(registerFailure(message));
+
+    dispatch(loginFailure(message));
+    console.error("Register error:", message);
+    throw new Error(message);
   }
 };
 

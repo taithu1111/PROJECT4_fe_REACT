@@ -218,6 +218,7 @@ export default function Navigation({ size }) {
   }, [jwt, auth.jwt]);
   useEffect(() => {
     if (auth.user) {
+      setOpenAuthModal(false);
       handleClose();
     }
     if (location.pathname === "/login" || location.pathname === "/register") {
@@ -425,36 +426,36 @@ export default function Navigation({ size }) {
         <div className="flex text-large  font-san">
           {/* Flyout menus */}
           <div className="flex cursor-pointer space-x-8">
-  <NavLink
-    to="/"
-    exact
-    className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
-    activeClassName="text-orange-500"
-  >
-    HOME
-  </NavLink>
-  <NavLink
-    to="/products"
-    className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
-    activeClassName="text-orange-500"
-  >
-    SHOPS
-  </NavLink>
-  <NavLink
-    to="/about"
-    className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
-    activeClassName="text-orange-500"
-  >
-    ABOUT US
-  </NavLink>
-  <NavLink
-    to="/contact"
-    className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
-    activeClassName="text-orange-500"
-  >
-    CONTACT US
-  </NavLink>
-</div>
+            <NavLink
+              to="/"
+              exact
+              className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
+              activeClassName="text-orange-500"
+            >
+              HOME
+            </NavLink>
+            <NavLink
+              to="/products"
+              className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
+              activeClassName="text-orange-500"
+            >
+              SHOPS
+            </NavLink>
+            <NavLink
+              to="/about"
+              className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
+              activeClassName="text-orange-500"
+            >
+              ABOUT US
+            </NavLink>
+            <NavLink
+              to="/contact"
+              className="hover:text-orange-500 transition-all duration-75 cursor-pointer"
+              activeClassName="text-orange-500"
+            >
+              CONTACT US
+            </NavLink>
+          </div>
 
         </div>
         <div

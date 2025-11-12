@@ -41,9 +41,9 @@ const LoginForm = () => {
           // Gọi action getUser để lấy thông tin user
           await dispatch(getUser(token));
           alert("Đăng nhập thành công!");
-          navigate("/"); // redirect về home hoặc dashboard
+          navigate("/"); // redirect về home sau khi đăng nhập thành công
         } else {
-          alert("Đăng nhập thất bại: Không nhận được token");
+          alert("Đăng nhập thất bại: Không nhận được token");// Cái này em sẽ sửa message sau
         }
       } catch (error) {
         alert("Đăng nhập thất bại: " + error.message);
