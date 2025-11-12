@@ -1,4 +1,4 @@
-import { Grid, TextField, Button ,Typography } from "@mui/material";
+import { Grid, TextField, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +18,7 @@ const LoginForm = () => {
     password: "",
   });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Basic validation
@@ -31,9 +31,23 @@ const LoginForm = () => {
     }
     setErrors(validationErrors);
 
-    // If there are no validation errors, proceed with login
     if (Object.keys(validationErrors).length === 0) {
-      dispatch(login(formData));
+      try {
+        // Gọi action login và chờ token trả về
+        await dispatch(login(formData));
+        const token = localStorage.getItem("jwt");
+
+        if (token) {
+          // Gọi action getUser để lấy thông tin user
+          await dispatch(getUser(token));
+          alert("Đăng nhập thành công!");
+          navigate("/"); // redirect về home hoặc dashboard
+        } else {
+          alert("Đăng nhập thất bại: Không nhận được token");
+        }
+      } catch (error) {
+        alert("Đăng nhập thất bại: " + error.message);
+      }
     }
   };
 
@@ -82,13 +96,13 @@ const LoginForm = () => {
             />
           </Grid>
 
-          <Grid item xs={12}  className="flex justify-center">
+          <Grid item xs={12} className="flex justify-center">
             <Button
               className="bg-[#3af04d]"
               type="submit"
               variant="contained"
               size="large"
-              sx={{ padding: "8px" ,paddingX:"20px" , bgcolor: "#3af04d" }}
+              sx={{ padding: "8px", paddingX: "20px", bgcolor: "#3af04d" }}
             >
               Login
             </Button>
