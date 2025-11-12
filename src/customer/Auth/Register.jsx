@@ -22,7 +22,7 @@ const Register = () => {
     password: "",
   });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Basic validation
@@ -41,11 +41,17 @@ const Register = () => {
     }
     setErrors(validationErrors);
 
-    
 
-    // If there are no validation errors, proceed with registration
+
     if (Object.keys(validationErrors).length === 0) {
-      dispatch(register(formData));
+      try {
+        // Chờ kết quả trả về từ action register
+        const message = await dispatch(register(formData));
+        alert(message || "Đăng ký thành công! Vui lòng đăng nhập."); // hiện alert
+        navigate("/login"); // chuyển sang trang login ngay
+      } catch (error) {
+        alert("Đăng ký thất bại: " + error.message);
+      }
     }
   };
 
