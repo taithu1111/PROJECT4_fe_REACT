@@ -36,6 +36,7 @@ export default function Product({ categories, handleClick }) {
     const fetchAllProducts = async () => {
       try {
         const data = await APIProduct.getAllProducts();
+        console.log("All products:", data);
         setProducts(data);
         setTotalPages(Math.ceil(data.length / productsPerPage) || 1);
         setCurrentPage(1);

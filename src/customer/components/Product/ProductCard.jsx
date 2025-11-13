@@ -27,12 +27,12 @@ const ProductCard = ({ product, handleClick }) => {
         className="relative overflow-hidden hover:shadow-lg"
       >
         <img
-          src={product.imageUrl}
+          src={product.images[0]}
           alt=""
           className="object-cover"
           style={{ width: "250px", height: "300px" }}
         />
-        
+
       </div>
 
       <div className="relative flex flex-col items-center justify-center group-hover:opacity-100 transition-all duration-500 px-14 h-40">
@@ -56,11 +56,11 @@ const ProductCard = ({ product, handleClick }) => {
       </div>
 
       <div
-          className="absolute top-0 right-0 p-2 flex text-gray-300 group-hover:text-black transition-all duration-600"
-          onClick={() => handleClick(product)}
-        >
-          <ShoppingCartOutlinedIcon sx={{ fontSize: "34px" }} className="text-xl" />
-        </div>
+        className="absolute top-0 right-0 p-2 flex text-gray-300 group-hover:text-black transition-all duration-600"
+        onClick={() => handleClick(product)}
+      >
+        <ShoppingCartOutlinedIcon sx={{ fontSize: "34px" }} className="text-xl" />
+      </div>
     </div>
   );
 };

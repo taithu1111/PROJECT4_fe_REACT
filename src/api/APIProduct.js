@@ -68,7 +68,6 @@ const APIProduct = {
         }
     },
 
-    // Sản phẩm random
     getRandomProducts: async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/product/random`, {
