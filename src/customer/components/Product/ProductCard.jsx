@@ -9,12 +9,17 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 const ProductCard = ({ product, handleClick }) => {
   const navigate = useNavigate();
   const [averageRating, setAverageRating] = useState(0);
-
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("jwt"); // Lấy token từ localStorage
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
   useEffect(() => {
     axios
-      .get(`http://localhost:1303/api/ratings/average-rating/${product.id}`)
+      .get(`http://localhost:8080/api/ratings/average-rating/${product.id}`, {
+        headers: getAuthHeaders(),
+      })
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         setAverageRating(res.data);
       })
       .catch((err) => console.log(err));
