@@ -9,14 +9,14 @@ import "../Product/Product.css";
 import APIProduct from "../../../api/APIProduct";
 
 const sortOptions = [
-  { name: "Sort", value: null, current: true },
-  { name: "Price: Low to High", value: "priceLow", current: false },
-  { name: "Price: High to Low", value: "priceHigh", current: false },
-  { name: "A - Z", value: "az", current: false },
-  { name: "Z - A", value: "za", current: false },
+  { name: "Sort", value: null },
+  { name: "Price: Low to High", value: "priceLow" },
+  { name: "Price: High to Low", value: "priceHigh" },
+  { name: "A - Z", value: "az" },
+  { name: "Z - A", value: "za" },
 ];
 
-export default function Product({ categories, handleClick }) {
+export default function Product({ handleClick }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -38,40 +38,62 @@ export default function Product({ categories, handleClick }) {
         const data = await APIProduct.getAllProducts();
         console.log("All products:", data);
         setProducts(data);
-        setTotalPages(Math.ceil(data.length / productsPerPage) || 1);
-        setCurrentPage(1);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
     };
-
     fetchAllProducts();
   }, []);
 
-  // Cập nhật sản phẩm hiển thị dựa trên trang hiện tại
+  // Lọc + sort + phân trang tự động khi state thay đổi
   useEffect(() => {
+    let filtered = [...products];
+
+    // Filter category
+    if (selectedCategory) {
+      filtered = filtered.filter(p => p.category?.category_name === selectedCategory);
+    }
+
+    // Filter price
+    filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
+
+    // Sort
+    if (selectedSort === "priceLow") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (selectedSort === "priceHigh") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (selectedSort === "az") {
+      filtered.sort((a, b) => a.productName.localeCompare(b.productName));
+    } else if (selectedSort === "za") {
+      filtered.sort((a, b) => b.productName.localeCompare(a.productName));
+    }
+
+    const pages = Math.ceil(filtered.length / productsPerPage) || 1;
+    setTotalPages(pages);
+
     const startIndex = (currentPage - 1) * productsPerPage;
     const endIndex = startIndex + productsPerPage;
-    setDisplayedProducts(products.slice(startIndex, endIndex));
-  }, [products, currentPage]);
+    setDisplayedProducts(filtered.slice(startIndex, endIndex));
+  }, [products, selectedCategory, minPrice, maxPrice, selectedSort, currentPage]);
 
   const handlePageChange = (event, newPage) => {
     setCurrentPage(newPage);
   };
 
-  const handleFilter = (value) => {
+  const handleFilter = value => {
     setSelectedCategory(value);
-    updateUrlParams({ category: value });
+    setCurrentPage(1);
   };
 
-  const handleChange = (event, newEvent) => {
-    setMinPrice(newEvent[0]);
-    setMaxPrice(newEvent[1]);
+  const handleChange = (event, newVal) => {
+    setMinPrice(newVal[0]);
+    setMaxPrice(newVal[1]);
+    setCurrentPage(1);
   };
 
-  const handleSort = (value) => {
+  const handleSort = value => {
     setSelectedSort(value);
-    updateUrlParams({ sort: value });
+    setCurrentPage(1);
   };
 
   const handleSearchChange = (event) => {
@@ -83,24 +105,9 @@ export default function Product({ categories, handleClick }) {
     navigate(`/search/${searchQuery}`);
   };
 
-  const updateUrlParams = (paramsObj) => {
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.set("category", selectedCategory);
-    searchParams.set("minPrice", minPrice);
-    searchParams.set("maxPrice", maxPrice);
-    searchParams.set("sort", selectedSort);
-
-    Object.entries(paramsObj).forEach(([key, value]) => {
-      if (value !== null) {
-        searchParams.set(key, value);
-      } else {
-        searchParams.delete(key);
-      }
-    });
-
-    const query = searchParams.toString();
-    navigate({ search: `?${query}` });
-  };
+  const uniqueCategories = [
+    ...new Set(products.map(p => p.category?.category_name))
+  ].filter(Boolean);
 
   return (
     <div className="bg-white">
@@ -111,11 +118,11 @@ export default function Product({ categories, handleClick }) {
             <div className="space-y-4">
               <select
                 className="px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 bg-white text-gray-600"
-                value={selectedSort}
+                value={selectedSort || ""}
                 onChange={(e) => handleSort(e.target.value)}
               >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value} className="hover:bg-green-500 hover:text-white">
+                {sortOptions.map(option => (
+                  <option key={option.value} value={option.value || ""} className="hover:bg-green-500 hover:text-white">
                     {option.name}
                   </option>
                 ))}
@@ -135,19 +142,21 @@ export default function Product({ categories, handleClick }) {
                 <div className="space-y-4">
                   <h2 className="text-sm font-semibold text-gray-500">Category</h2>
                   <div className="space-y-2">
-                    <RadioGroup value={selectedCategory}>
-                      {categories.map((category) => (
-                        <label key={category.id} className="flex items-center cursor-pointer">
+                    <RadioGroup value={selectedCategory || ""}>
+                      {uniqueCategories.map((name, idx) => (
+                        <label key={idx} className="flex items-center cursor-pointer">
                           <Radio
                             className="mr-2"
-                            value={category.name}
-                            onChange={() => handleFilter(category.name)}
+                            value={name}
+                            onChange={() => handleFilter(name)}
                             sx={{
-                              color: selectedCategory === category.name ? "#34D399" : "#6B7280",
-                              "&.Mui-checked": { color: "#34D399" },
+                              color: selectedCategory === name ? "#34D399" : "#6B7280",
+                              "&.Mui-checked": {
+                                color: "#34D399"
+                              }
                             }}
                           />
-                          <span>{category.name}</span>
+                          <span>{name}</span>
                         </label>
                       ))}
                     </RadioGroup>
@@ -160,9 +169,7 @@ export default function Product({ categories, handleClick }) {
                       onChange={handleChange}
                       valueLabelDisplay="auto"
                       aria-label="range-slider"
-                      min={0}
-                      step={50}
-                      max={10000}
+                      min={0} step={50} max={10000}
                       sx={{ maxWidth: "250px", width: "250px", color: "#34D399" }}
                     />
                     <div className="text-sm text-gray-600 mt-2">
@@ -205,8 +212,7 @@ export default function Product({ categories, handleClick }) {
                 ))
               )}
 
-              {/* Pagination */}
-              {products.length > 0 && searchQuery === "" && (
+              {displayedProducts.length > 0 && (
                 <div className="col-span-2 flex items-center justify-center mt-6">
                   <Stack spacing={2} direction="row">
                     <Pagination

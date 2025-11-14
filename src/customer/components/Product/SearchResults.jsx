@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import ProductCard from "./ProductCard";
-
+import { getAuthHeaders } from "../../../api/GetAuthHeaders";
 export default function SearchResults() {
   const [products, setProducts] = useState([]);
   const { searchQuery } = useParams();
@@ -10,7 +10,9 @@ export default function SearchResults() {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:1303/api/products/search-by-name?name=${searchQuery}`
+        `http://localhost:8080/api/product/search-by-name?name=${searchQuery}`, {
+        headers: getAuthHeaders()
+      }
       )
       .then((res) => {
         setProducts(res.data);

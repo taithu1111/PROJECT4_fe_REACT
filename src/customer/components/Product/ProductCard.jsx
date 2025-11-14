@@ -5,14 +5,11 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Rating } from "@mui/material"; // Chỉ import Rating từ @mui/material
 import axios from "axios";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-
+import { getAuthHeaders } from "../../../api/GetAuthHeaders";
 const ProductCard = ({ product, handleClick }) => {
   const navigate = useNavigate();
   const [averageRating, setAverageRating] = useState(0);
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("jwt"); // Lấy token từ localStorage
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/ratings/average-rating/${product.id}`, {
@@ -43,7 +40,7 @@ const ProductCard = ({ product, handleClick }) => {
       <div className="relative flex flex-col items-center justify-center group-hover:opacity-100 transition-all duration-500 px-14 h-40">
         <h1 className="title font-mar text-xl text-center text-black relative">
           <a href="#" className="group text-black">
-            {product.title}
+            {product.productName}
             <span className="text-sm block max-w-0 group-hover:max-w-full transition-all duration-1000 h-0.5 bg-black ease-in-out"></span>
           </a>
         </h1>
