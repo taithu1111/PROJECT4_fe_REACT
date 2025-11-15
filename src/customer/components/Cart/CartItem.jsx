@@ -3,7 +3,7 @@ import IconButton from '@mui/material/IconButton'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Button from '@mui/material/Button'
-
+import { formatCurrency } from '../../../comon/formatCurrency';
 const CartItem = ({ item }) => {
     return (
         <div className='p-5 shadow border rounded-md'>
@@ -19,8 +19,8 @@ const CartItem = ({ item }) => {
                     {/* Nếu có thông tin thêm như size, color, bạn thêm vào props item */}
                     <p className='opacity-70 mt-2'>Seller: {item.brand}</p>
                     <div className='flex space-x-5 items-center text-gray-900 pt-6 '>
-                        <p className='font-semibold'>${item.price}</p>
-                        <p className='opacity-50 line-through'>${item.price}</p>
+                        <p className='font-semibold'>{formatCurrency(item.price)} VND</p>
+                        <p className='opacity-50 line-through'>{formatCurrency(item.price * 1.1)} VND</p>
                         {/* Bạn có thể tính % giảm giá nếu có */}
                     </div>
                 </div>

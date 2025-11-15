@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import InputAdornment from "@mui/material/InputAdornment";
 import CartItem from "./CartItem";
+import { formatCurrency } from "../../../comon/formatCurrency";
 const Cart = ({ cart, setCart }) => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState([]);
@@ -105,7 +106,7 @@ const Cart = ({ cart, setCart }) => {
             <div className="space-y-3 font-semibold mb-10">
               <div className="flex justify-between pt-3 text-black">
                 <span>Price</span>
-                <span className="text-green-600">{cartData.totalPrice}</span>
+                <span className="text-green-600">{formatCurrency(cartData.totalPrice)}</span>
               </div>
               <div className="flex justify-between pt-3 ">
                 <span>Discount</span>
@@ -117,7 +118,7 @@ const Cart = ({ cart, setCart }) => {
               </div>
               <div className="transition-transform tran flex justify-between pt-3 text-black font-bold">
                 <span>Total Amount</span>
-                <span>{cartData.totalPrice}</span>{/* //Phần giảm giá của anh sơn nhé tính lại giá sau khi giảm  */}
+                <span>{formatCurrency(cartData.totalPrice)}</span>{/* //Phần giảm giá của anh sơn nhé tính lại giá sau khi giảm  */}
               </div>
             </div>
             <Button

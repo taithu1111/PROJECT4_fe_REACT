@@ -6,6 +6,7 @@ import { Rating } from "@mui/material"; // Chỉ import Rating từ @mui/materia
 import axios from "axios";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { getAuthHeaders } from "../../../api/GetAuthHeaders";
+import { formatCurrency } from "../../../comon/formatCurrency";
 const ProductCard = ({ product, handleClick }) => {
   const navigate = useNavigate();
   const [averageRating, setAverageRating] = useState(0);
@@ -53,7 +54,7 @@ const ProductCard = ({ product, handleClick }) => {
           />
         </div>
         <p className="text-lg font-medium font-san text-black">
-          ${product.price}
+          {formatCurrency(product.price, true)} VND
         </p>
       </div>
 
