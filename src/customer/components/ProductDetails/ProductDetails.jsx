@@ -38,9 +38,35 @@ export default function ProductDetails() {
     );
   }
 
-  const handleAddToCart = () => {
-    navigate("/cart");
+  const handleAddToCart = async () => {
+    const addItemData = {
+      productId: dataProduct.id,
+      quantity: 1,
+      price: dataProduct.price
+    };
+
+    // Console toàn bộ object
+    console.log("AddItemRequest:", addItemData);
+
+    try {
+      const res = await axios.put(
+        "http://localhost:8080/api/cart/add",
+        addItemData,
+        { headers: getAuthHeaders() }
+      );
+
+      if (res.data.status) {
+        navigate("/cart");
+      } else {
+        alert(res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Add to cart failed!");
+    }
   };
+
+
 
   return (
     <div className="bg-white mx-50 lg:px-20">
@@ -54,7 +80,7 @@ export default function ProductDetails() {
           >
             <li className="text-sm">
               <span className="font-medium text-gray-500 hover:text-gray-600">
-                {dataProduct.title}
+                {dataProduct.productName}
               </span>
             </li>
           </ol>
@@ -154,7 +180,7 @@ export default function ProductDetails() {
                   Category:
                 </span>
                 <span className="text-[15px] font-normal">
-                  {dataProduct.category?.name || "Uncategorized"}
+                  {dataProduct.category?.category_name || "Uncategorized"}
                 </span>
               </span>
             </div>
@@ -206,7 +232,16 @@ export default function ProductDetails() {
             <div className="max-w-full ml-[180px]">
               <h1 className="font-mar text-[28px] mb-8">Reviews</h1>
 
-              <p className="text-gray-600">No reviews yet.</p>
+              <div> {dataProduct.reviews.length > 0 ? (
+                dataProduct.reviews.map((item, index) => (
+                  <p className="text-gray-600" key={index}>
+                    {item.comment}
+                  </p>
+                ))
+              ) : (
+                <p>No Review</p>
+              )}</div>
+
 
               <div className="mt-[60px]">
                 <h1 className="font-marsf text-[28px] my-2 ">Add a review</h1>

@@ -4,26 +4,24 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Button from '@mui/material/Button'
 
-const CartItem = () => {
+const CartItem = ({ item }) => {
     return (
-        // box item checkout
         <div className='p-5 shadow border rounded-md'>
-
             {/* product card info */}
             <div className='flex items-center'>
                 <div className='w-[5rem] h-[5rem] lg:w-[9rem] lg:h-[9rem]'>
-                    <img src="https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/e777c881-5b62-4250-92a6-362967f54cca/air-force-1-07-shoe-NMmm1B.png"
+                    <img src={item.productImageUrl}
                         className='w-full h-full object-cover object-top'
-                        alt="" />
+                        alt={item.productName} />
                 </div>
                 <div className='ml-5 space-y-1'>
-                    <p className='font-semibold'>Nike Air Force One</p>
-                    <p className='opacity-70'>Size L, White</p>
-                    <p className='opacity-70 mt-2'>Seller: Oriz</p>
+                    <p className='font-semibold'>{item.productName}</p>
+                    {/* Nếu có thông tin thêm như size, color, bạn thêm vào props item */}
+                    <p className='opacity-70 mt-2'>Seller: {item.brand}</p>
                     <div className='flex space-x-5 items-center text-gray-900 pt-6 '>
-                        <p className='font-semibold'>199</p>
-                        <p className='opacity-50 line-through'>200</p>
-                        <p className='text-green-500 font-semibold'>50% OFF</p>
+                        <p className='font-semibold'>${item.price}</p>
+                        <p className='opacity-50 line-through'>${item.price}</p>
+                        {/* Bạn có thể tính % giảm giá nếu có */}
                     </div>
                 </div>
             </div>
@@ -34,11 +32,10 @@ const CartItem = () => {
                     <IconButton sx={{ color: "red" }}>
                         <RemoveCircleOutlineIcon />
                     </IconButton>
-                    <span className='py-1 px-7 border rounded-sm'>3</span>
+                    <span className='py-1 px-7 border rounded-sm'>{item.quantity}</span>
                     <IconButton sx={{ color: "purple" }}>
                         <AddCircleOutlineIcon />
                     </IconButton>
-
                 </div>
 
                 <div>

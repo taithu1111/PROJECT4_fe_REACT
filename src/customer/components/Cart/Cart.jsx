@@ -1,11 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-
-const Cart = ({cart, setCart}) => {
+import { getAuthHeaders } from "../../../api/GetAuthHeaders";
+import axios from "axios";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import InputAdornment from "@mui/material/InputAdornment";
+import CartItem from "./CartItem";
+const Cart = ({ cart, setCart }) => {
   const navigate = useNavigate();
- 
-
+  const [cartData, setCartData] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8080/api/cart`, {
+        headers: getAuthHeaders(),
+      })
+      .then((res) => {
+        console.log("Dữ liệu BE Cart : ", res.data);
+        setCartData(res.data);
+        setCartItems(res.data.cartItems);
+        console.log("Cart Items : ", cartItems);
+      })
+      .catch((err) => console.log(err));
+  }, []);
   const handleCheckout = () => {
     navigate("/checkout?step=2");
   };
@@ -19,7 +36,7 @@ const Cart = ({cart, setCart}) => {
         <span className="text-[15px] text-gray-500">Cart</span>{" "}
       </section>
 
-      <div className="font-mar w-full">
+      {/* <div className="font-mar w-full">
         <table className="w-full">
           <thead className="w-full">
             <tr className="text-3xl my-10 ">
@@ -31,49 +48,55 @@ const Cart = ({cart, setCart}) => {
             </tr>
           </thead>
           <tbody className="w-full">
-            {/* {.map((item) => {
-              <tr className="px-6">
-              <td className="w-auto border">
-                <div className="flex items-center">
-                  <img
-                    className="w-[4.6rem]"
-                    src={item.imageUrl}
-                    alt=""
-                  />
-                  <p className="text-[1.4rem]">{item.title}</p>
-                </div>
-              </td>
-
-              <td className=" justify-center text-center border text-gray-400 text-[1.4rem]">
-                <p clas>$72</p>
-              </td>
-              <td className=" justify-center text-center border text-[1.4rem]">
-                <input
-                  className="outline-none border cursor-pointer px-9 w-[6.6rem] h-[3rem]"
-                  type="text"
-                  name=""
-                  id=""
-                />
-                <InputAdornment>
-                </InputAdornment>
-              </td>
-              <td className=" justify-center text-center border text-gray-400 text-[1.4rem]">
-                $72
-              </td>
-              <td className=" justify-center text-center border text-[1.4rem]">
-                <CloseIcon />
-              </td>
-            </tr>
-            })} */}
+            {cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <tr key={item.id} className="px-6">
+                  <td className="w-auto border">
+                    <div className="flex items-center">
+                      <img className="w-[4.6rem]" src={item.productImageUrl} alt="" />
+                      <p className="text-[1.4rem]">{item.productName}</p>
+                    </div>
+                  </td>
+                  <td className="text-center border text-gray-400 text-[1.4rem]">
+                    ${item.price}
+                  </td>
+                  <td className="text-center border text-[1.4rem]">
+                    <input
+                      className="outline-none border cursor-pointer px-9 w-[6.6rem] h-[3rem]"
+                      type="number"
+                      value={item.quantity}
+                      readOnly
+                    />
+                  </td>
+                  <td className="text-center border text-gray-400 text-[1.4rem]">
+                    ${item.price * item.quantity}
+                  </td>
+                  <td className="text-center border text-[1.4rem]">
+                    <CloseIcon />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="text-center py-5">
+                  Your cart is empty
+                </td>
+              </tr>
+            )}
           </tbody>
-        </table>
-      </div>
 
-      {/* <div className="lg:grid grid-cols-3 lg:px-16 relative">
+        </table>
+      </div> */}
+
+      <div className="lg:grid grid-cols-3 lg:px-16 relative">
         <div className="col-span-2">
-          {[1, 1, 1, 1].map((item) => (
-            <CartItem />
-          ))}
+          {cartItems.length > 0 ? (
+            cartItems.map((item) => (
+              <CartItem key={item.id} item={item} />
+            ))
+          ) : (
+            <p>Your cart is empty</p>
+          )}
         </div>
         <div className="px-5 sticky top-0 h-[100vh] mt-5 lg:mt-0">
           <div className=" border">
@@ -82,11 +105,11 @@ const Cart = ({cart, setCart}) => {
             <div className="space-y-3 font-semibold mb-10">
               <div className="flex justify-between pt-3 text-black">
                 <span>Price</span>
-                <span className="text-green-600">$123</span>
+                <span className="text-green-600">{cartData.totalPrice}</span>
               </div>
               <div className="flex justify-between pt-3 ">
                 <span>Discount</span>
-                <span className="text-green-600">$23</span>
+                <span className="text-green-600">$0</span> {/* //Phần giảm giá của anh sơn nhé Vocher */}
               </div>
               <div className="flex justify-between pt-3 text-black">
                 <span>Delivery</span>
@@ -94,7 +117,7 @@ const Cart = ({cart, setCart}) => {
               </div>
               <div className="transition-transform tran flex justify-between pt-3 text-black font-bold">
                 <span>Total Amount</span>
-                <span>$123</span>
+                <span>{cartData.totalPrice}</span>{/* //Phần giảm giá của anh sơn nhé tính lại giá sau khi giảm  */}
               </div>
             </div>
             <Button
@@ -107,7 +130,7 @@ const Cart = ({cart, setCart}) => {
             </Button>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
