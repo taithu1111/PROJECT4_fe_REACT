@@ -25,6 +25,7 @@ export default function ProductDetails() {
       })
       .then((res) => {
         setDataProduct(res.data);
+
         console.log("Product detail:", res.data);
       })
       .catch((err) => console.error(err));
@@ -54,8 +55,8 @@ export default function ProductDetails() {
         addItemData,
         { headers: getAuthHeaders() }
       );
-
-      if (res.data.status) {
+      console.log("Add to cart response:", res.data);
+      if (res.data?.status === true) {
         navigate("/cart");
       } else {
         alert(res.data.message);
