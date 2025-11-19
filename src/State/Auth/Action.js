@@ -27,9 +27,9 @@ export const register = (userData) => async (dispatch) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
     const user = response.data;
-    if (user.token) {
-      localStorage.setItem("jwt", user.token);
-    }
+    // if (user.token) {
+    //   localStorage.setItem("jwt", user.token);
+    // }
     console.log("user", user);
     dispatch(registerSuccess(user.token));
     return user.message;

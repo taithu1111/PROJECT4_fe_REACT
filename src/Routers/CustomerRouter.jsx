@@ -12,7 +12,7 @@ import OrderDetails from "../customer/components/Order/OrderDetails";
 import axios from "axios";
 import Contact from "../customer/components/Contact/Contact";
 import AboutUs from "../customer/components/AboutUs/AboutUs";
-import SearchResults from "../customer/components/Product/SearchResults"; // Đã sửa đường dẫn tới SearchResults
+import SearchResults from "../customer/components/Product/SearchResults";
 
 const CustomerRouter = () => {
   const [show, setShow] = useState(true);

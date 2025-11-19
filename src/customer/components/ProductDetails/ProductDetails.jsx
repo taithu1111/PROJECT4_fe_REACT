@@ -46,7 +46,6 @@ export default function ProductDetails() {
       price: dataProduct.price
     };
 
-    // Console toàn bộ object
     console.log("AddItemRequest:", addItemData);
 
     try {
@@ -56,10 +55,26 @@ export default function ProductDetails() {
         { headers: getAuthHeaders() }
       );
       console.log("Add to cart response:", res.data);
-      if (res.data?.status === true) {
+
+      const resp = res.data;
+
+      // Hỗ trợ cả 2 kiểu: backend trả về object {status: true, message: "..."}
+      // hoặc trả về plain string "Item add to Cart"
+      const isSuccess =
+        (resp && typeof resp === "object" && resp.status === true) ||
+        (typeof resp === "string" && resp.toLowerCase().includes("item"));
+
+      if (isSuccess) {
         navigate("/cart");
+        return;
+      }
+
+      if (resp && typeof resp === "object" && resp.message) {
+        alert(resp.message);
+      } else if (typeof resp === "string") {
+        alert(resp);
       } else {
-        alert(res.data.message);
+        alert("Add to cart failed!");
       }
     } catch (error) {
       console.error(error);

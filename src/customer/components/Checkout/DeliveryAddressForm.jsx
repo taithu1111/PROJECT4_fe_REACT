@@ -2,21 +2,24 @@ import { Grid, Button, TextField, Box } from "@mui/material";
 import React from "react";
 import AddressCard from "../AddressCard/AddressCard";
 
-const DeliveryAddressForm = () => {
+const DeliveryAddressForm = ({ onSubmitAddress }) => {
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
 
     const address = {
-      firstName: data.get("firstName"),
-      lastName: data.get("lastName"),
-      address: data.get("address"),
+      streetAddress: data.get("address"),
       city: data.get("city"),
-      state: data.get("state"),
-      zipCode: data.get("zipcode"),
-      mobile: data.get("mobile"),
+      zipCode: data.get("zip"),
     };
-    console.log("address", address);
+
+    console.log("address gửi API:", address);
+
+    // Gửi dữ liệu ra Checkout.jsx để gọi API
+    if (onSubmitAddress) {
+      onSubmitAddress(address);
+    }
   };
 
   return (
@@ -42,7 +45,6 @@ const DeliveryAddressForm = () => {
         <Grid item xs={12} lg={7}>
           <Box className="border rounded-s-md shadow-md p-5">
             <form onSubmit={handleSubmit}>
-              {/* Container Address Form */}
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -55,7 +57,6 @@ const DeliveryAddressForm = () => {
                   />
                 </Grid>
 
-                {/* Last Name Field */}
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
@@ -67,7 +68,6 @@ const DeliveryAddressForm = () => {
                   />
                 </Grid>
 
-                {/* Address Field */}
                 <Grid item xs={12}>
                   <TextField
                     required
@@ -91,6 +91,7 @@ const DeliveryAddressForm = () => {
                     autoComplete="given-name"
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
@@ -101,6 +102,7 @@ const DeliveryAddressForm = () => {
                     autoComplete="given-name"
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
@@ -111,6 +113,7 @@ const DeliveryAddressForm = () => {
                     autoComplete="shipping postal-code"
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
@@ -121,6 +124,7 @@ const DeliveryAddressForm = () => {
                     autoComplete="given-name"
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <Button
                     sx={{ py: 2, mt: 2, bgcolor: "#9553fe" }}

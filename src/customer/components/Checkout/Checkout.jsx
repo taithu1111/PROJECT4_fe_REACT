@@ -5,18 +5,21 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom';
 import DeliveryAddressForm from './DeliveryAddressForm';
 import OrderSummary from './OrderSummary';
+import axios from 'axios';
+import { getAuthHeaders } from "../../../api/GetAuthHeaders";
 
 const steps = ['Login', 'Add delivery address', 'Order summary', 'Payment'];
 
 export default function Checkout() {
     const [activeStep, setActiveStep] = React.useState(0);
-    // const [skipped, setSkipped] = React.useState(new Set());
     const location = useLocation();
-    const querySearch = new URLSearchParams(location.search)
-    const step = querySearch.get("step")
+    const navigate = useNavigate();
+
+    const querySearch = new URLSearchParams(location.search);
+    const step = querySearch.get("step");
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -25,6 +28,35 @@ export default function Checkout() {
     const handleBack = () => {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
+
+    const handleCreateOrder = async (address) => {
+        try {
+            const payload = {
+                city: address.city,
+                street_address: address.streetAddress,
+                zip_code: address.zipCode
+            };
+
+            // Gọi API tạo order
+            const res = await axios.post(
+                "http://localhost:8080/api/orders/",
+                payload,
+                { headers: getAuthHeaders() }
+            );
+
+            console.log("Order created:", res.data);
+
+            // Nếu tạo thành công, chuyển sang step 3 (Order summary / Payment)
+            navigate("/checkout?step=3");
+        } catch (err) {
+            // Log lỗi chi tiết
+            console.error("Error creating order:", err.response?.data || err.message);
+
+            // Có thể hiện thông báo cho user
+            alert("Đặt hàng thất bại! Vui lòng thử lại.");
+        }
+    };
+
 
     return (
         <div className='px-10 lg:px-20'>
@@ -41,6 +73,7 @@ export default function Checkout() {
                         );
                     })}
                 </Stepper>
+
                 {activeStep === steps.length ? (
                     <>
                         <Typography sx={{ mt: 2, mb: 1 }}>
@@ -49,8 +82,6 @@ export default function Checkout() {
                     </>
                 ) : (
                     <>
-                        {/* <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography> */}
-
                         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                             <Button
                                 color="inherit"
@@ -60,19 +91,18 @@ export default function Checkout() {
                             >
                                 Back
                             </Button>
-                            {/* <Box sx={{ flex: '1 1 auto' }} />
-
-                            <Button onClick={handleNext}>
-                                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                            </Button> */}
                         </Box>
+
                         <div className='mt-10'>
-                            {step == 2 ? <DeliveryAddressForm /> : <OrderSummary />}
+                            {step == 2 ? (
+                                <DeliveryAddressForm onSubmitAddress={handleCreateOrder} />
+                            ) : (
+                                <OrderSummary />
+                            )}
                         </div>
                     </>
                 )}
             </Box>
         </div>
-
     );
 }
