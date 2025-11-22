@@ -7,13 +7,17 @@ import axios from "axios";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { getAuthHeaders } from "../../../api/GetAuthHeaders";
 import { formatCurrency } from "../../../comon/formatCurrency";
+import { API_BASE_URL } from "../../../api/APIProduct";
+import placeholderImage from "../../../assets/images/placeholder.png";
+
 const ProductCard = ({ product, handleClick }) => {
   const navigate = useNavigate();
   const [averageRating, setAverageRating] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/ratings/average-rating/${product.id}`, {
+      .get(`${API_BASE_URL}/api/ratings/average-rating/${product.id}`, {
         headers: getAuthHeaders(),
       })
       .then((res) => {
@@ -24,45 +28,54 @@ const ProductCard = ({ product, handleClick }) => {
   }, [product.id]);
 
   return (
-    <div className="group relative cursor-pointer transition-shadow">
+    <div className="group relative cursor-pointer transition-all w-full">
       <div
         onClick={() => navigate(`/product/${product.id}`)}
-        className="relative overflow-hidden hover:shadow-lg"
+        className="relative overflow-hidden hover:shadow-md rounded-lg bg-white"
       >
-        <img
-          src={product.images[0]}
-          alt=""
-          className="object-cover"
-          style={{ width: "250px", height: "300px" }}
-        />
+        <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center">
+          <img
+            src={
+              imageError || !product.images || !product.images[0]
+                ? placeholderImage
+                : product.images[0]
+            }
+            alt={product.productName || "Product image"}
+            className="object-cover border border-gray-200 rounded-lg w-full h-full"
+            onError={() => setImageError(true)}
+          />
 
+          <div
+            className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hover:bg-gray-100 flex items-center justify-center"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick(product);
+            }}
+          >
+            <ShoppingCartOutlinedIcon sx={{ fontSize: "18px" }} className="text-gray-600" />
+          </div>
+        </div>
       </div>
 
-      <div className="relative flex flex-col items-center justify-center group-hover:opacity-100 transition-all duration-500 px-14 h-40">
-        <h1 className="title font-mar text-xl text-center text-black relative">
-          <a href="#" className="group text-black">
+      <div className="relative flex flex-col items-start justify-start mt-2 px-1">
+        <h2 className="title font-mar text-sm font-medium text-gray-900 line-clamp-2 mb-1 min-h-[2.5rem] product-title">
+          <a href="#" className="group text-gray-900 hover:text-green-600 transition-colors">
             {product.productName}
-            <span className="text-sm block max-w-0 group-hover:max-w-full transition-all duration-1000 h-0.5 bg-black ease-in-out"></span>
           </a>
-        </h1>
-        <div>
+        </h2>
+        <div className="flex items-center mb-1">
           <Rating
             name="read-only"
             value={averageRating}
             precision={0.5}
             readOnly
+            size="small"
+            sx={{ fontSize: "14px" }}
           />
         </div>
-        <p className="text-lg font-medium font-san text-black">
-          {formatCurrency(product.price, true)} VND
+        <p className="text-base font-semibold font-san text-gray-900">
+          {formatCurrency(product.price, "$")}
         </p>
-      </div>
-
-      <div
-        className="absolute top-0 right-0 p-2 flex text-gray-300 group-hover:text-black transition-all duration-600"
-        onClick={() => handleClick(product)}
-      >
-        <ShoppingCartOutlinedIcon sx={{ fontSize: "34px" }} className="text-xl" />
       </div>
     </div>
   );

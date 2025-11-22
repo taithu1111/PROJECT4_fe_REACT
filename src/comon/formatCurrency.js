@@ -1,13 +1,10 @@
-export const formatCurrency = (value, showCurrency = false) => {
-    if (value === null || value === undefined) return "";
+export const formatCurrency = (value, currencySymbol = "") => {
+  if (value === null || value === undefined) return "";
 
-    // Ép về số
-    const number = Number(value);
+  const number = Number(value);
+  if (isNaN(number)) return value;
 
-    if (isNaN(number)) return value;
+  const formatted = number.toLocaleString("en-US"); // or "vi-VN" if you want Vietnamese format
 
-    // Format theo chuẩn VN
-    const formatted = number.toLocaleString("vi-VN");
-
-    return showCurrency ? `${formatted} ₫` : formatted;
+  return currencySymbol ? `${formatted} ${currencySymbol}` : formatted;
 };
