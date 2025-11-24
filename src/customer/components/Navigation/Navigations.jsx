@@ -33,6 +33,7 @@ export default function Navigation() {
   const [cart, setCart] = useState({ cartItems: [], totalPrice: 0 });
   const [state, setState] = useState({ right: false });
   const [openAuthModal, setOpenAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState("register");
   const [anchorEl, setAnchorEl] = useState(null);
   const openUserMenu = Boolean(anchorEl);
   const jwt = localStorage.getItem("jwt");
@@ -79,7 +80,10 @@ export default function Navigation() {
     handleCloseUserMenu();
   };
 
-  const handleOpenAuth = () => setOpenAuthModal(true);
+  const handleOpenAuth = () => {
+    setAuthMode("register");
+    setOpenAuthModal(true);
+  };
   const handleCloseAuth = () => setOpenAuthModal(false);
 
 
@@ -238,7 +242,10 @@ export default function Navigation() {
         </div>
       </header>
 
-      <AuthModal handleClose={handleCloseAuth} open={openAuthModal} />
+      <AuthModal handleClose={handleCloseAuth} open={openAuthModal} mode={authMode} 
+      setAuthMode={setAuthMode}
+      setOpen={setOpenAuthModal}
+      />
     </div>
   );
 }

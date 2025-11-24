@@ -13,6 +13,7 @@ import axios from "axios";
 import Contact from "../customer/components/Contact/Contact";
 import AboutUs from "../customer/components/AboutUs/AboutUs";
 import SearchResults from "../customer/components/Product/SearchResults";
+import ResetPasswordPage from "../customer/Auth/ResetPasswordPage";
 
 const CustomerRouter = () => {
   const [show, setShow] = useState(true);
@@ -59,14 +60,6 @@ const CustomerRouter = () => {
         />
       </div>
       <Routes>
-        <Route
-          path="/login"
-          element={<HomePage data={data} handleClick={handleClick} />}
-        ></Route>
-        <Route
-          path="/register"
-          element={<HomePage data={data} handleClick={handleClick} />}
-        ></Route>
 
         {show ? (
           <Route
@@ -76,6 +69,7 @@ const CustomerRouter = () => {
         ) : (
           <Route path="/cart" element={<Cart />}></Route>
         )}
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/cart"
           element={

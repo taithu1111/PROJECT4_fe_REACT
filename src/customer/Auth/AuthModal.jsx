@@ -1,8 +1,8 @@
-import { Box, Modal, Typography } from "@mui/material";
-import React from "react";
+import { Box, Modal } from "@mui/material";
+import React, { useState } from "react";
 import Register from "./Register";
-import { useLocation } from "react-router-dom";
 import LoginForm from "./LoginForm";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 const style = {
   position: "absolute",
@@ -13,34 +13,41 @@ const style = {
   p: 4,
 };
 
-const AuthModal = ({ handleClose, open }) => {
-  const location = useLocation();
+export default function AuthModal({ handleClose, open, initialMode = "register" }) {
+  const [mode, setMode] = useState(initialMode); // "register" | "login"
+
+  const toggleMode = () => setMode(mode === "login" ? "register" : "login");
 
   return (
-    <div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box
+        sx={{
+          ...style,
+          backgroundColor: "white",
+          boxShadow: "lg",
+          border: "2px solid",
+          borderColor: "purple.600",
+          borderRadius: "md",
+          padding: "40px",
+        }}
       >
-        <Box
-          sx={{
-            ...style,
-            backgroundColor: "white", // Change background color if needed
-            boxShadow: "lg", // Apply shadow
-            border: "2px solid",
-            borderColor: "purple.600",
-            rounded: "md",
-            padding:"40px"
-          }}
-          className="p-4 border-2 border-purple-600 rounded-md bg-white shadow-lg"
-        >
-          {location.pathname === "/login" ? <LoginForm/> : <Register/>}
-        </Box>
-      </Modal>
-    </div>
-  );
-};
+        {mode === "login" && (
+          <LoginForm onSwitchMode={setMode} />
+        )}
 
-export default AuthModal;
+        {mode === "register" && (
+          <Register onSwitchMode={setMode} />
+        )}
+
+        {mode === "forgot" && (
+          <ForgotPasswordForm onSwitchMode={setMode} />
+        )}
+      </Box>
+    </Modal>
+  );
+}

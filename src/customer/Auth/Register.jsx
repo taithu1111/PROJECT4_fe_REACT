@@ -1,10 +1,11 @@
-import { Grid, TextField, Button, Typography } from "@mui/material";
+import { Grid, TextField, Button, Typography, IconButton, InputAdornment } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUser, register } from "../../State/Auth/Action";
+import { register } from "../../State/Auth/Action";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const Register = () => {
+const Register = ({ onSwitchMode }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -15,63 +16,60 @@ const Register = () => {
     password: "",
   });
 
-  const [errors, setErrors] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  // 🔹 Password regex requirement
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
-    // Basic validation
+  // 🔹 Email regex requirement
+  const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     const validationErrors = {};
-    if (!formData.firstName) {
-      validationErrors.firstName = "First Name is required";
-    }
-    if (!formData.lastName) {
-      validationErrors.lastName = "Last Name is required";
-    }
+
+    // 🔹 First and Last Name
+    if (!formData.firstName) validationErrors.firstName = "First Name is required";
+    if (!formData.lastName) validationErrors.lastName = "Last Name is required";
+
+    // 🔹 Email validation
     if (!formData.email) {
       validationErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      validationErrors.email = "Invalid email format";
     }
+
+    // 🔹 Password validation
     if (!formData.password) {
       validationErrors.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      validationErrors.password =
+        "Password must be at least 8 characters and include uppercase, lowercase, and a number";
     }
+
     setErrors(validationErrors);
-
-
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        // Chờ kết quả trả về từ action register
         const message = await dispatch(register(formData));
-        alert(message || "Đăng ký thành công! Vui lòng đăng nhập."); // hiện alert
-        navigate("/login"); // chuyển sang trang login ngay
+        alert(message || "Registration successful! Please login.");
+        onSwitchMode(); // switch to login inside modal
       } catch (error) {
-
-        alert("Đăng ký thất bại: " + error.message);
+        alert("Registration failed: " + error.message);
       }
     }
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <div>
-      <Typography
-        variant="h5"
-        align="center"
-        gutterBottom
-        style={{ marginBottom: "25px" }}
-      >
+      <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "25px" }}>
         Register
       </Typography>
       <form onSubmit={handleSubmit}>
@@ -83,14 +81,12 @@ const Register = () => {
               name="firstName"
               label="First Name"
               fullWidth
-              autoComplete="given-name"
               value={formData.firstName}
               onChange={handleInputChange}
-              error={Boolean(errors.firstName)}
+              error={!!errors.firstName}
               helperText={errors.firstName}
             />
           </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               required
@@ -98,14 +94,12 @@ const Register = () => {
               name="lastName"
               label="Last Name"
               fullWidth
-              autoComplete="family-name"
               value={formData.lastName}
               onChange={handleInputChange}
-              error={Boolean(errors.lastName)}
+              error={!!errors.lastName}
               helperText={errors.lastName}
             />
           </Grid>
-
           <Grid item xs={12}>
             <TextField
               required
@@ -113,54 +107,50 @@ const Register = () => {
               name="email"
               label="Email"
               fullWidth
-              autoComplete="email"
               value={formData.email}
               onChange={handleInputChange}
-              error={Boolean(errors.email)}
+              error={!!errors.email}
               helperText={errors.email}
             />
           </Grid>
+
           <Grid item xs={12}>
             <TextField
               required
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               label="Password"
               fullWidth
-              autoComplete="new-password"
               value={formData.password}
               onChange={handleInputChange}
-              error={Boolean(errors.password)}
+              error={!!errors.password}
               helperText={errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(prev => !prev)}>
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
           </Grid>
 
           <Grid item xs={12} className="flex justify-center">
-            <Button
-              className="bg-[#9155FD] "
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{ padding: "8px", paddingX: "20px", bgcolor: "#3af04d" }}
-            >
+            <Button type="submit" variant="contained" size="large" sx={{ bgcolor: "#3af04d" }}>
               Register
             </Button>
           </Grid>
         </Grid>
       </form>
 
-      <div className="flex justify-center flex-col items-center">
-        <div className="py-3 flex items-center">
-          <p>You have already an account?</p>
-          <Button
-            onClick={() => navigate("/login")}
-            className="ml-2"
-            size="small"
-          >
-            Login
-          </Button>
-        </div>
+      <div className="flex justify-center flex-col items-center mt-3">
+        <p>Already have an account?</p>
+        <Button onClick={() => onSwitchMode("login")} size="small">
+          Login
+        </Button>
       </div>
     </div>
   );

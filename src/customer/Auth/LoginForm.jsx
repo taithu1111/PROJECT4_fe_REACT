@@ -1,62 +1,65 @@
-import { Grid, TextField, Button, Typography } from "@mui/material";
+import { Grid, TextField, Button, Typography, IconButton, InputAdornment } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUser, login } from "../../State/Auth/Action";
+import { login, getUser } from "../../State/Auth/Action";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const LoginForm = () => {
+const LoginForm = ({ onSwitchMode }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
+  // 🔹 Email regex
+  const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  // 🔹 Password regex same as register
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
-    // Basic validation
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const validationErrors = {};
+
+    // 🔹 Email validation
     if (!formData.email) {
       validationErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      validationErrors.email = "Invalid email format";
     }
+
+    // 🔹 Password validation
     if (!formData.password) {
       validationErrors.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      validationErrors.password =
+        "Password must be at least 8 characters and include uppercase, lowercase, and a number";
     }
+
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        // Gọi action login và chờ token trả về
         await dispatch(login(formData));
         const token = localStorage.getItem("jwt");
-
         if (token) {
-          // Gọi action getUser để lấy thông tin user
           await dispatch(getUser(token));
-          alert("Đăng nhập thành công!");
-          navigate("/"); // redirect về home sau khi đăng nhập thành công
+          alert("Login successful!");
+          navigate("/"); // redirect to home
         } else {
-          alert("Đăng nhập thất bại: Không nhận được token");// Cái này em sẽ sửa message sau
+          alert("Login failed: no token received");
         }
       } catch (error) {
-        alert("Đăng nhập thất bại: " + error.message);
+        alert("Login failed: " + error.message);
       }
     }
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -64,7 +67,7 @@ const LoginForm = () => {
       <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "25px" }}>
         Login
       </Typography>
-      <form onSubmit={handleSubmit} className="formLogin">
+      <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <TextField
@@ -73,54 +76,55 @@ const LoginForm = () => {
               name="email"
               label="Email"
               fullWidth
-              autoComplete="email"
               value={formData.email}
               onChange={handleInputChange}
-              error={Boolean(errors.email)}
+              error={!!errors.email}
               helperText={errors.email}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
               required
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               label="Password"
               fullWidth
-              autoComplete="password"
-              type="password"
               value={formData.password}
               onChange={handleInputChange}
-              error={Boolean(errors.password)}
+              error={!!errors.password}
               helperText={errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(prev => !prev)}>
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
           </Grid>
-
           <Grid item xs={12} className="flex justify-center">
-            <Button
-              className="bg-[#3af04d]"
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{ padding: "8px", paddingX: "20px", bgcolor: "#3af04d" }}
-            >
+            <Button type="submit" variant="contained" size="large" sx={{ bgcolor: "#3af04d" }}>
               Login
             </Button>
           </Grid>
         </Grid>
       </form>
 
-      <div className="flex justify-center flex-col items-center">
-        <div className="py-3 flex items-center">
-          <p>If you don't have an account</p>
-          <Button
-            onClick={() => navigate("/register")}
-            className="ml-5 "
-            size="small"
-          >
-            Register
-          </Button>
-        </div>
+      <div className="flex justify-center flex-col items-center mt-3">
+        <p>Don't have an account?</p>
+        <Button onClick={() => onSwitchMode("register")} size="small">
+          Register
+        </Button>
+        <Button
+          onClick={() => onSwitchMode("forgot")}
+          size="small"
+          variant="text"
+        >
+          Forgot Password?
+        </Button>
       </div>
     </div>
   );
