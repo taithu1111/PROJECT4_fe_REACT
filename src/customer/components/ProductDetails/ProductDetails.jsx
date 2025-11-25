@@ -11,6 +11,7 @@ import { TextareaAutosize } from "@mui/base";
 import axios from "axios";
 import { Button } from "@mui/material";
 import { getAuthHeaders } from "../../../api/GetAuthHeaders";
+import { API_BASE_URL } from "../../../api/APIProduct";
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function ProductDetails() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/product/${id}`, {
+      .get(`${API_BASE_URL}/api/product/${id}`, {
         headers: getAuthHeaders(),
       })
       .then((res) => {
@@ -50,7 +51,7 @@ export default function ProductDetails() {
 
     try {
       const res = await axios.put(
-        "http://localhost:8080/api/cart/add",
+        `${API_BASE_URL}/api/cart/add`,
         addItemData,
         { headers: getAuthHeaders() }
       );
@@ -167,12 +168,19 @@ export default function ProductDetails() {
                 {dataProduct.description}
               </p>
 
-              {/* Quantity + Add to cart giữ nguyên */}
-              <form className="mt-10 flex">
+              {/* Quantity + Add to cart */}
+              <form className="mt-10 flex items-center space-x-4">
                 <Button
                   variant="contained"
                   color="success"
                   onClick={handleAddToCart}
+                  className="transition-transform hover:scale-105"
+                  sx={{
+                    backgroundColor: "#34D399",
+                    "&:hover": {
+                      backgroundColor: "#10B981"
+                    }
+                  }}
                 >
                   <AddShoppingCartIcon className="text-xs" />
                   <span className="text-xs ml-2">Add to Cart</span>
@@ -217,54 +225,84 @@ export default function ProductDetails() {
         </section>
 
         {/* DESCRIPTION & REVIEWS */}
-        <section className="col-6 tab p-5">
-          <ul className="flex space-x-4 ml-[165px]">
-            <li className="p-4 cursor-pointer" onClick={() => setToggle(1)}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <ul className="flex space-x-4 mb-4">
+            <li 
+              className={`p-4 cursor-pointer transition-all duration-200 ${
+                toggle === 1 
+                  ? "font-semibold text-[#CDB866] border-b-2 border-[#CDB866]" 
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+              onClick={() => setToggle(1)}
+            >
               Description
             </li>
-            <li className="p-4 cursor-pointer" onClick={() => setToggle(2)}>
+            <li 
+              className={`p-4 cursor-pointer transition-all duration-200 ${
+                toggle === 2 
+                  ? "font-semibold text-[#CDB866] border-b-2 border-[#CDB866]" 
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+              onClick={() => setToggle(2)}
+            >
               Reviews
             </li>
           </ul>
 
           <div
-            className="w-full ml-44"
+            className="w-full"
             style={{
               backgroundColor: "#CDB866",
-              width: "1500px",
               height: "1px",
             }}
           ></div>
 
           {/* DESCRIPTION */}
           {toggle === 1 && (
-            <div className="max-w-full ml-[180px]">
-              <p>{dataProduct.description}</p>
+            <div className="max-w-full mt-6 animate-fadeIn">
+              <p className="text-gray-700 leading-relaxed">{dataProduct.description}</p>
             </div>
           )}
 
-          {/* REVIEWS giữ nguyên */}
+          {/* REVIEWS */}
           {toggle === 2 && (
-            <div className="max-w-full ml-[180px]">
+            <div className="max-w-full mt-6 animate-fadeIn">
               <h1 className="font-mar text-[28px] mb-8">Reviews</h1>
 
-              <div> {dataProduct.reviews.length > 0 ? (
-                dataProduct.reviews.map((item, index) => (
-                  <p className="text-gray-600" key={index}>
-                    {item.comment}
-                  </p>
-                ))
-              ) : (
-                <p>No Review</p>
-              )}</div>
-
+              <div className="space-y-4 mb-8">
+                {dataProduct.reviews.length > 0 ? (
+                  dataProduct.reviews.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                    >
+                      <p className="text-gray-700 leading-relaxed">{item.comment}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">No reviews yet. Be the first to review this product!</p>
+                )}
+              </div>
 
               <div className="mt-[60px]">
-                <h1 className="font-marsf text-[28px] my-2 ">Add a review</h1>
+                <h1 className="font-marsf text-[28px] my-2">Add a review</h1>
                 <TextareaAutosize
                   minRows={6}
-                  className="outline-none w-full border border-gray-300 rounded-md p-2"
+                  placeholder="Share your thoughts about this product..."
+                  className="outline-none w-full border border-gray-300 rounded-md p-4 focus:ring-2 focus:ring-[#CDB866] focus:border-[#CDB866] transition-all"
                 />
+                <Button
+                  variant="contained"
+                  sx={{
+                    mt: 2,
+                    backgroundColor: "#34D399",
+                    "&:hover": {
+                      backgroundColor: "#10B981"
+                    }
+                  }}
+                >
+                  Submit Review
+                </Button>
               </div>
             </div>
           )}

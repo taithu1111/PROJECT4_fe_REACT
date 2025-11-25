@@ -14,6 +14,8 @@ import Contact from "../customer/components/Contact/Contact";
 import AboutUs from "../customer/components/AboutUs/AboutUs";
 import SearchResults from "../customer/components/Product/SearchResults";
 import AdminContent from "../admin/AdminContent";
+import ResetPasswordPage from "../customer/Auth/ResetPasswordPage";
+
 const CustomerRouter = () => {
   const [show, setShow] = useState(true);
   const [cart, setCart] = useState([]);
@@ -80,6 +82,7 @@ const CustomerRouter = () => {
         ) : (
           <Route path="/cart" element={<Cart />}></Route>
         )}
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/cart"
           element={
