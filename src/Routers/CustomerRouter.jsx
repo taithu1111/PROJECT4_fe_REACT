@@ -13,7 +13,7 @@ import axios from "axios";
 import Contact from "../customer/components/Contact/Contact";
 import AboutUs from "../customer/components/AboutUs/AboutUs";
 import SearchResults from "../customer/components/Product/SearchResults";
-
+import AdminContent from "../admin/AdminContent";
 const CustomerRouter = () => {
   const [show, setShow] = useState(true);
   const [cart, setCart] = useState([]);
@@ -59,6 +59,10 @@ const CustomerRouter = () => {
         />
       </div>
       <Routes>
+        <Route
+          path="/admin"
+          element={<AdminContent />}
+        ></Route>
         <Route
           path="/login"
           element={<HomePage data={data} handleClick={handleClick} />}
