@@ -3,8 +3,8 @@ import { Star, Trash2, Search } from 'lucide-react';
 const RatingManagement = () => {
     const [ratings, setRatings] = useState([
         { id: 1, rating: 5, productId: 1, productName: 'iPhone 15 Pro', userId: 1, userName: 'phuc t', createdAt: '2025-11-15 15:36:37' },
-        { id: 2, rating: 4.9, productId: 2, productName: 'Samsung Galaxy S23', userId: 1, userName: 'phuc t', createdAt: '2025-11-15 15:36:37' },
-        { id: 3, rating: 4.8, productId: 3, productName: 'Sony WH‑1000XM5 Headphones', userId: 1, userName: 'phuc t', createdAt: '2025-11-15 15:36:37' },
+        { id: 2, rating: 4.2, productId: 2, productName: 'Samsung Galaxy S23', userId: 1, userName: 'phuc t', createdAt: '2025-11-15 15:36:37' },
+        { id: 3, rating: 3.4, productId: 3, productName: 'Sony WH‑1000XM5 Headphones', userId: 1, userName: 'phuc t', createdAt: '2025-11-15 15:36:37' },
     ]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRating, setFilterRating] = useState('all');
