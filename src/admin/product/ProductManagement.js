@@ -1,25 +1,89 @@
-import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+// src/admin/product/ProductManagement.js
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit, Trash2, Search, RefreshCw } from 'lucide-react';
 import ProductModal from './ProductModal';
+import AdminProductService from '../api/AdminProductService';
+
 const ProductManagement = () => {
-    const [products, setProducts] = useState([
-        { id: 1, productName: 'iPhone 15 Pro', brand: 'Apple', price: 1200, quantity: 50, categoryId: 1 },
-        { id: 2, productName: 'Samsung Galaxy S23', brand: 'Samsung', price: 900, quantity: 60, categoryId: 1 },
-        { id: 3, productName: 'Sony WH‑1000XM5 Headphones', brand: 'Sony', price: 500, quantity: 40, categoryId: 1 },
-    ]);
+    const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [filterBrand, setFilterBrand] = useState('all');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const data = await AdminProductService.getALlProduct();
+
+            // Note: Cần implement getAllProducts trong backend hoặc dùng public API
+            // Tạm thời giữ empty array
+            setProducts([]);
+            setError(null);
+        } catch (err) {
+            console.error('Error fetching products:', err);
+            setError('Không thể tải danh sách sản phẩm');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateProduct = async (productData) => {
+        try {
+            await AdminProductService.createProduct(productData);
+            fetchProducts();
+            setShowModal(false);
+        } catch (err) {
+            console.error('Error creating product:', err);
+            alert('Không thể tạo sản phẩm');
+        }
+    };
+
+    const handleUpdateProduct = async (productId, productData) => {
+        try {
+            await AdminProductService.updateProduct(productId, productData);
+            fetchProducts();
+            setShowModal(false);
+        } catch (err) {
+            console.error('Error updating product:', err);
+            alert('Không thể cập nhật sản phẩm');
+        }
+    };
+
+    const handleDeleteProduct = async (productId) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+
+        try {
+            await AdminProductService.deleteProduct(productId);
+            fetchProducts();
+        } catch (err) {
+            console.error('Error deleting product:', err);
+            alert('Không thể xóa sản phẩm');
+        }
+    };
 
     const brands = [...new Set(products.map(p => p.brand))];
 
     const filteredProducts = products.filter(product => {
-        const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.brand.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = product.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.brand?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesBrand = filterBrand === 'all' || product.brand === filterBrand;
         return matchesSearch && matchesBrand;
     });
+
+    if (loading && products.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <RefreshCw className="animate-spin text-gray-400" size={32} />
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -33,6 +97,12 @@ const ProductManagement = () => {
                     Thêm sản phẩm
                 </button>
             </div>
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-700">
+                    {error}
+                </div>
+            )}
 
             <div className="bg-white rounded-lg border border-gray-200">
                 <div className="p-4 border-b border-gray-200">
@@ -57,6 +127,12 @@ const ProductManagement = () => {
                                 <option key={brand} value={brand}>{brand}</option>
                             ))}
                         </select>
+                        <button
+                            onClick={fetchProducts}
+                            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                            <RefreshCw size={20} />
+                        </button>
                     </div>
                 </div>
 
@@ -69,6 +145,7 @@ const ProductManagement = () => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thương hiệu</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Giá</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số lượng</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mô tả</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
                             </tr>
                         </thead>
@@ -87,6 +164,9 @@ const ProductManagement = () => {
                                             {product.quantity}
                                         </span>
                                     </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
+                                        {product.description || '-'}
+                                    </td>
                                     <td className="px-6 py-4 text-sm">
                                         <div className="flex gap-2">
                                             <button
@@ -95,7 +175,10 @@ const ProductManagement = () => {
                                             >
                                                 <Edit size={16} />
                                             </button>
-                                            <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                            <button
+                                                onClick={() => handleDeleteProduct(product.id)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            >
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>
@@ -104,11 +187,24 @@ const ProductManagement = () => {
                             ))}
                         </tbody>
                     </table>
+
+                    {filteredProducts.length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                            Chưa có sản phẩm nào
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {showModal && <ProductModal product={editingProduct} onClose={() => setShowModal(false)} />}
+            {showModal && (
+                <ProductModal
+                    product={editingProduct}
+                    onClose={() => setShowModal(false)}
+                    onSave={editingProduct ? handleUpdateProduct : handleCreateProduct}
+                />
+            )}
         </div>
     );
 };
+
 export default ProductManagement;

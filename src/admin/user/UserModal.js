@@ -1,11 +1,17 @@
+// ============================================
+// FILE: src/admin/user/UserModal.js (UPDATED)
+// ============================================
 import React, { useState } from 'react';
+
 const UserModal = ({ user, onClose }) => {
     const [formData, setFormData] = useState({
         email: user?.email || '',
         firstName: user?.firstName || '',
         lastName: user?.lastName || '',
         mobile: user?.mobile || '',
-        password: ''
+        password: '',
+        role: user?.role || 'USER',
+        active: user?.active !== undefined ? user.active : true
     });
 
     return (
@@ -57,6 +63,31 @@ const UserModal = ({ user, onClose }) => {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
+                        <select
+                            value={formData.role}
+                            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
+                        >
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            id="active"
+                            checked={formData.active}
+                            onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                            className="w-4 h-4 text-[#2d2d2d] focus:ring-[#2d2d2d] border-gray-300 rounded"
+                        />
+                        <label htmlFor="active" className="text-sm font-medium text-gray-700">
+                            Tài khoản hoạt động
+                        </label>
+                    </div>
+
                     {!user && (
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
@@ -87,4 +118,5 @@ const UserModal = ({ user, onClose }) => {
         </div>
     );
 };
+
 export default UserModal;
