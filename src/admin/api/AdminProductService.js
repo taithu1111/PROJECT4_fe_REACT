@@ -11,7 +11,7 @@ const getAuthHeader = () => {
 const AdminProductService = {
     getALlProduct: async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/admin/products/raw`, {
+            const response = await axios.get(`http://localhost:8080/api/admin/products`, {
                 headers: getAuthHeader()
             });
             console.log("Get all product by admin :  ", response.data);
