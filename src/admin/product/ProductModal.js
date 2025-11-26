@@ -2,168 +2,248 @@
 import React, { useState } from 'react';
 
 const ProductModal = ({ product, onClose, onSave }) => {
+
     const [formData, setFormData] = useState({
-        productName: product?.productName || '',
-        brand: product?.brand || '',
-        price: product?.price || '',
-        quantity: product?.quantity || '',
-        categoryId: product?.categoryId || 1,
+        title: product?.title || '',
         description: product?.description || '',
-        imageUrl: ''
+        brand: product?.brand || '',
+        price: product?.price || 0,
+        quantity: product?.quantity || 0,
+        firstLevelCategory: product?.firstLevelCategory || '',
+        secondLevelCategory: product?.secondLevelCategory || '',
+        colors: product?.colors || [],      // array string
+        images: product?.images || []       // array object: { url }
     });
-    const [loading, setLoading] = useState(false);
+
+    const [newColor, setNewColor] = useState('');
+    const [newImageUrl, setNewImageUrl] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
-        try {
-            // Prepare data for API
-            const productData = {
-                productName: formData.productName,
-                brand: formData.brand,
-                price: parseFloat(formData.price),
-                quantity: parseInt(formData.quantity),
-                categoryId: parseInt(formData.categoryId),
-                description: formData.description
-            };
+        // build req body đúng CreateProductRequest
+        const payload = {
+            title: formData.title,
+            description: formData.description,
+            brand: formData.brand,
+            price: parseInt(formData.price),
+            quantity: parseInt(formData.quantity),
+            firstLevelCategory: formData.firstLevelCategory,
+            secondLevelCategory: formData.secondLevelCategory,
+            colors: formData.colors.map(c => ({ color: c })),
+            images: formData.images.map(url => ({ url }))
+        };
 
-            if (product) {
-                // Update existing product
-                await onSave(product.id, productData);
-            } else {
-                // Create new product
-                await onSave(productData);
-            }
+        if (product) {
+            await onSave(product.id, payload);
+        } else {
+            await onSave(payload);
+        }
 
-            onClose();
-        } catch (error) {
-            console.error('Error saving product:', error);
-            alert('Lỗi khi lưu sản phẩm');
-        } finally {
-            setLoading(false);
+        onClose();
+    };
+
+    const addColor = () => {
+        if (newColor.trim() !== '') {
+            setFormData({ ...formData, colors: [...formData.colors, newColor] });
+            setNewColor('');
         }
     };
 
+    const removeColor = (c) => {
+        setFormData({ ...formData, colors: formData.colors.filter(x => x !== c) });
+    };
+
+    const addImage = () => {
+        if (newImageUrl.trim() !== '') {
+            setFormData({ ...formData, images: [...formData.images, newImageUrl] });
+            setNewImageUrl('');
+        }
+    };
+
+    const removeImage = (url) => {
+        setFormData({ ...formData, images: formData.images.filter(x => x !== url) });
+    };
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <h3 className="text-xl font-semibold text-[#2d2d2d] mb-4">
-                    {product ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={onClose}>
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}>
+
+                <h3 className="text-xl font-semibold mb-4">
+                    {product ? "Cập nhật sản phẩm" : "Thêm sản phẩm mới"}
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+
+                    {/* Title */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Tên sản phẩm <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block font-medium">Tên sản phẩm *</label>
                         <input
-                            type="text"
-                            value={formData.productName}
-                            onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
+                            className="w-full px-3 py-2 border rounded"
                         />
                     </div>
 
+                    {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả sản phẩm</label>
+                        <label className="block font-medium">Mô tả *</label>
                         <textarea
+                            rows={3}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            rows={3}
-                            placeholder="Nhập mô tả chi tiết về sản phẩm..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
+                            className="w-full px-3 py-2 border rounded"
+                            required
                         />
                     </div>
 
+                    {/* Brand + Price */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Thương hiệu <span className="text-red-500">*</span>
-                            </label>
+                            <label className="block font-medium">Brand *</label>
                             <input
-                                type="text"
                                 value={formData.brand}
                                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
+                                className="w-full px-3 py-2 border rounded"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Danh mục <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.categoryId}
-                                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
-                            >
-                                <option value="">Chọn danh mục</option>
-                                <option value={1}>Đồ điện tử</option>
-                                {/* Thêm categories từ API */}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Giá ($) <span className="text-red-500">*</span>
-                            </label>
+                            <label className="block font-medium">Giá *</label>
                             <input
                                 type="number"
-                                step="0.01"
-                                min="0"
+                                min={0}
                                 value={formData.price}
                                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Số lượng <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="number"
-                                min="0"
-                                value={formData.quantity}
-                                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
+                                className="w-full px-3 py-2 border rounded"
                             />
                         </div>
                     </div>
 
+                    {/* Qty */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">URL Hình ảnh</label>
+                        <label className="block font-medium">Số lượng *</label>
                         <input
-                            type="text"
-                            value={formData.imageUrl}
-                            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                            placeholder="https://example.com/image.jpg"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
+                            type="number"
+                            min={0}
+                            value={formData.quantity}
+                            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                            required
+                            className="w-full px-3 py-2 border rounded"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Lưu vào bảng product_image</p>
                     </div>
 
-                    <div className="flex gap-3 mt-6">
+                    {/* Category 1 */}
+                    <div>
+                        <label className="block font-medium">First Level Category *</label>
+                        <input
+                            value={formData.firstLevelCategory}
+                            onChange={(e) => setFormData({ ...formData, firstLevelCategory: e.target.value })}
+                            placeholder="example: Electronics"
+                            required
+                            className="w-full px-3 py-2 border rounded"
+                        />
+                    </div>
+
+                    {/* Category2 */}
+                    <div>
+                        <label className="block font-medium">Second Level Category *</label>
+                        <input
+                            value={formData.secondLevelCategory}
+                            onChange={(e) => setFormData({ ...formData, secondLevelCategory: e.target.value })}
+                            placeholder="example: Laptop / Phone"
+                            required
+                            className="w-full px-3 py-2 border rounded"
+                        />
+                    </div>
+
+                    {/* COLORS */}
+                    <div>
+                        <label className="block font-medium">Màu sắc</label>
+                        <div className="flex gap-2 mb-2">
+                            <input
+                                placeholder="Thêm màu (Red, Blue ...)"
+                                value={newColor}
+                                onChange={(e) => setNewColor(e.target.value)}
+                                className="flex-1 px-3 py-2 border rounded"
+                            />
+                            <button
+                                type="button"
+                                onClick={addColor}
+                                className="px-3 py-2 bg-gray-800 text-white rounded"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        <div className="flex gap-2 flex-wrap">
+                            {formData.colors.map(c => (
+                                <span key={c} className="px-2 py-1 bg-gray-200 rounded flex items-center gap-2">
+                                    {c}
+                                    <button
+                                        type="button"
+                                        onClick={() => removeColor(c)}
+                                        className="text-red-500"
+                                    >
+                                        ✕
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* IMAGES */}
+                    <div>
+                        <label className="block font-medium">Hình ảnh sản phẩm</label>
+                        <div className="flex gap-2 mb-2">
+                            <input
+                                placeholder="https://..."
+                                value={newImageUrl}
+                                onChange={(e) => setNewImageUrl(e.target.value)}
+                                className="flex-1 px-3 py-2 border rounded"
+                            />
+                            <button
+                                type="button"
+                                onClick={addImage}
+                                className="px-3 py-2 bg-gray-800 text-white rounded"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        <ul className="space-y-1">
+                            {formData.images.map(url => (
+                                <li key={url} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                    <span className="truncate">{url}</span>
+                                    <button
+                                        type="button"
+                                        className="text-red-600"
+                                        onClick={() => removeImage(url)}
+                                    >
+                                        ✕
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="flex gap-3 justify-end pt-4">
                         <button
                             type="button"
                             onClick={onClose}
-                            disabled={loading}
-                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            className="px-4 py-2 border rounded"
                         >
                             Hủy
                         </button>
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="flex-1 px-4 py-2 bg-[#2d2d2d] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-black text-white rounded"
                         >
-                            {loading ? 'Đang lưu...' : (product ? 'Cập nhật' : 'Thêm mới')}
+                            {product ? "Cập nhật" : "Thêm mới"}
                         </button>
                     </div>
                 </form>

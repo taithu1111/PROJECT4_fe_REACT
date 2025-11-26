@@ -21,10 +21,8 @@ const ProductManagement = () => {
         try {
             setLoading(true);
             const data = await AdminProductService.getALlProduct();
-
-            // Note: Cần implement getAllProducts trong backend hoặc dùng public API
-            // Tạm thời giữ empty array
-            setProducts([]);
+            setProducts(data);
+            // console.log("Products fetched: ", products[1]);
             setError(null);
         } catch (err) {
             console.error('Error fetching products:', err);
@@ -64,7 +62,7 @@ const ProductManagement = () => {
             fetchProducts();
         } catch (err) {
             console.error('Error deleting product:', err);
-            alert('Không thể xóa sản phẩm');
+            alert('Không thể xóa sản phẩm > Hãy kiểm tra xem sản phẩm có trong đơn hàng nào không ');
         }
     };
 
