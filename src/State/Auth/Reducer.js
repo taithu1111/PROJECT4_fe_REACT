@@ -9,6 +9,12 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  UPDATE_USER_FAILURE,
+  UPDATE_USER_REQUEST,
+  UPDATE_USER_SUCCESS,
+  CHANGE_PASSWORD_FAILURE,
+  CHANGE_PASSWORD_REQUEST,
+  CHANGE_PASSWORD_SUCCESS,
 } from "./ActionType";
 
 const initialState = {
@@ -23,6 +29,8 @@ export const authReducer = (state = initialState, action) => {
     case REGISTER_REQUEST:
     case LOGIN_REQUEST:
     case GET_USER_REQUEST:
+    case UPDATE_USER_REQUEST:
+    case CHANGE_PASSWORD_REQUEST:
       return { ...state, isLoading: true, error: null };
 
     case REGISTER_SUCCESS:
@@ -30,11 +38,17 @@ export const authReducer = (state = initialState, action) => {
       return { ...state, isLoading: false, error: null, jwt: action.payload };
 
     case GET_USER_SUCCESS:
+    case UPDATE_USER_SUCCESS:
       return { ...state, isLoading: false, error: null, user: action.payload };
+
+    case CHANGE_PASSWORD_SUCCESS:
+      return { ...state, isLoading: false, error: null };
 
     case REGISTER_FAILURE:
     case LOGIN_FAILURE:
     case GET_USER_FAILURE:
+    case UPDATE_USER_FAILURE:
+    case CHANGE_PASSWORD_FAILURE:
       return { ...state, isLoading: false, error: action.payload };
 
     case LOGOUT:

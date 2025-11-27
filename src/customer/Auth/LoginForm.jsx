@@ -5,55 +5,40 @@ import { useNavigate } from "react-router-dom";
 import { login, getUser } from "../../State/Auth/Action";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const LoginForm = ({ onSwitchMode }) => {
+const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
-  // 🔹 Email regex
   const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
-  // 🔹 Password regex same as register
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
 
-    // 🔹 Email validation
-    if (!formData.email) {
-      validationErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      validationErrors.email = "Invalid email format";
-    }
+    if (!formData.email) validationErrors.email = "Email is required";
+    else if (!emailRegex.test(formData.email)) validationErrors.email = "Invalid email format";
 
-    // 🔹 Password validation
-    if (!formData.password) {
-      validationErrors.password = "Password is required";
-    } else if (!passwordRegex.test(formData.password)) {
+    if (!formData.password) validationErrors.password = "Password is required";
+    else if (!passwordRegex.test(formData.password))
       validationErrors.password =
-        "Password must be at least 8 characters and include uppercase, lowercase, and a number";
-    }
+        "Password must be at least 8 characters, include uppercase, lowercase, and a number";
 
     setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        await dispatch(login(formData));
-        const token = localStorage.getItem("jwt");
-        if (token) {
-          await dispatch(getUser(token));
-          alert("Login successful!");
-          navigate("/"); // redirect to home
-        } else {
-          alert("Login failed: no token received");
-        }
-      } catch (error) {
-        alert("Login failed: " + error.message);
+    try {
+      const token = await dispatch(login(formData));
+      if (token) {
+        await dispatch(getUser(token));
+        onLoginSuccess(); // close modal
+        navigate("/"); // redirect home
       }
+    } catch (err) {
+      alert("Login failed: " + err.message);
     }
   };
 
@@ -64,7 +49,7 @@ const LoginForm = ({ onSwitchMode }) => {
 
   return (
     <div>
-      <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "25px" }}>
+      <Typography variant="h5" align="center" gutterBottom>
         Login
       </Typography>
       <form onSubmit={handleSubmit}>
@@ -97,11 +82,11 @@ const LoginForm = ({ onSwitchMode }) => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(prev => !prev)}>
+                    <IconButton onClick={() => setShowPassword((prev) => !prev)}>
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
-                )
+                ),
               }}
             />
           </Grid>
@@ -118,11 +103,7 @@ const LoginForm = ({ onSwitchMode }) => {
         <Button onClick={() => onSwitchMode("register")} size="small">
           Register
         </Button>
-        <Button
-          onClick={() => onSwitchMode("forgot")}
-          size="small"
-          variant="text"
-        >
+        <Button onClick={() => onSwitchMode("forgot")} size="small" variant="text">
           Forgot Password?
         </Button>
       </div>

@@ -218,8 +218,8 @@ export default function Navigation() {
             open={openUserMenu}
             onClose={handleCloseUserMenu}
           >
-            <MenuItem onClick={handleCloseUserMenu}>Profile</MenuItem>
-            <MenuItem onClick={() => navigate("/account/order")}>My account</MenuItem>
+            <MenuItem onClick={() => { navigate("/account/profile"); handleCloseUserMenu(); }}>Profile</MenuItem>
+            <MenuItem onClick={() => { navigate("/account/order"); handleCloseUserMenu(); }}>Order History</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
 
@@ -242,9 +242,9 @@ export default function Navigation() {
         </div>
       </header>
 
-      <AuthModal handleClose={handleCloseAuth} open={openAuthModal} mode={authMode} 
-      setAuthMode={setAuthMode}
-      setOpen={setOpenAuthModal}
+      <AuthModal handleClose={handleCloseAuth} open={openAuthModal} mode={authMode}
+        setAuthMode={setAuthMode}
+        setOpen={setOpenAuthModal}
       />
     </div>
   );
