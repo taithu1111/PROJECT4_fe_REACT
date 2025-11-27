@@ -21,6 +21,7 @@ export default function ProductDetails() {
   const [dataProduct, setDataProduct] = useState(null);
   const [toggle, setToggle] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     axios
@@ -45,7 +46,7 @@ export default function ProductDetails() {
   const handleAddToCart = async () => {
     const addItemData = {
       productId: dataProduct.id,
-      quantity: 1,
+      quantity: quantity,
       price: dataProduct.price
     };
 
@@ -210,24 +211,66 @@ export default function ProductDetails() {
                 </div>
               )}
 
-              {/* Add to cart */}
-              <form className="mt-10 flex items-center space-x-4">
+              {/* Quantity Selector and Add to cart */}
+              <div className="mt-10 space-y-4">
+                {/* Quantity Selector */}
+                <div className="flex items-center gap-4">
+                  <label className="text-base font-semibold text-gray-700">Quantity:</label>
+                  <div className="flex items-center border border-gray-300 rounded-md">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max="99"
+                      value={quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 1;
+                        setQuantity(Math.min(Math.max(1, val), 99));
+                      }}
+                      className="w-16 text-center border-x border-gray-300 py-2 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(Math.min(99, quantity + 1))}
+                      className="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    ({dataProduct.quantity} available)
+                  </span>
+                </div>
+
+                {/* Add to Cart Button */}
                 <Button
                   variant="contained"
                   color="success"
                   onClick={handleAddToCart}
+                  disabled={quantity > dataProduct.quantity}
                   className="transition-transform hover:scale-105"
                   sx={{
                     backgroundColor: "#34D399",
                     "&:hover": {
                       backgroundColor: "#10B981"
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#D1D5DB"
                     }
                   }}
                 >
                   <AddShoppingCartIcon className="text-xs" />
-                  <span className="text-xs ml-2">Add to Cart</span>
+                  <span className="text-xs ml-2">
+                    Add {quantity} {quantity === 1 ? 'item' : 'items'} to Cart
+                  </span>
                 </Button>
-              </form>
+              </div>
             </div>
 
             {/* Category */}

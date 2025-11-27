@@ -18,6 +18,7 @@ import { getUser, logout } from "../../../State/Auth/Action";
 import { useDispatch, useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import axios from "axios";
+import placeholderImage from "../../../assets/images/placeholder.png";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -38,7 +39,7 @@ export default function Navigation() {
   const openUserMenu = Boolean(anchorEl);
   const jwt = localStorage.getItem("jwt");
 
-  // --- Fetch cart từ BE ---
+  // --- Fetch cart from backend ---
   const fetchCart = async () => {
     if (!jwt) return;
     try {
@@ -51,7 +52,7 @@ export default function Navigation() {
     }
   };
 
-  // Khi mở Shopping Bag, fetch lại dữ liệu
+  // When opening Shopping Bag, fetch data
   const toggleDrawer = (anchor, open) => (event) => {
     if (
       event.type === "keydown" &&
@@ -88,72 +89,89 @@ export default function Navigation() {
 
 
   const list = (anchor) => (
-    <Box sx={{ width: 400 }} role="presentation" onKeyDown={toggleDrawer(anchor, false)}>
-      <div className="font-mar m-14">
-        <p className="text-3xl mb-4">Shopping Bag</p>
-        {cart.cartItems.length > 0 ? (
-          cart.cartItems.map((item) => (
-            <Grid key={item.id} container className="w-40 group mb-4">
-              <Grid item xs={3}>
-                <img
-                  src={item.productImageUrl}
-                  alt={item.productName}
-                  className="w-full h-auto object-cover"
-                />
-              </Grid>
-              <Grid item xs={7} sx={{ display: "flex", alignItems: "center" }}>
-                <div>
-                  <p className="text-black font-medium">{item.productName}</p>
-                  <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
-                  <p className="text-green-600 font-semibold">
-                    {item.price ? item.price.toLocaleString("vi-VN") + " VND" : ""}
-                  </p>
-                </div>
-              </Grid>
-              <Grid item xs={2} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-                <button
-                  onClick={async () => {
-                    try {
-                      // Gọi API xóa item
-                      await axios.delete(`http://localhost:8080/api/cartItem/${item.id}`, {
-                        headers: { Authorization: `Bearer ${jwt}` },
-                      });
-                      // Sau khi xóa, fetch lại cart để cập nhật giao diện
-                      fetchCart();
-                    } catch (error) {
-                      console.error("Error deleting cart item:", error);
-                    }
-                  }}
-                >
-                  <XMarkIcon className="w-5 h-5 text-gray-600 hover:text-red-500" />
-                </button>
-              </Grid>
+    <Box sx={{ width: 400, height: '100%', display: 'flex', flexDirection: 'column' }} role="presentation" onKeyDown={toggleDrawer(anchor, false)}>
+      <div className="flex-1 overflow-auto p-6">
+        <p className="text-3xl font-bold mb-6 text-gray-900">Shopping Bag</p>
 
-            </Grid>
-          ))
+        {cart.cartItems && cart.cartItems.length > 0 ? (
+          <div className="space-y-4">
+            {cart.cartItems.map((item) => (
+              <div key={item.id} className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-white">
+                <Grid container spacing={2} alignItems="center">
+                  {/* Product Image */}
+                  <Grid item xs={3}>
+                    <img
+                      src={item.productImageUrl || placeholderImage}
+                      alt={item.productName}
+                      className="w-full h-20 object-cover rounded-md border border-gray-200"
+                      onError={(e) => { e.target.src = placeholderImage; }}
+                    />
+                  </Grid>
+
+                  {/* Product Details */}
+                  <Grid item xs={7}>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 line-clamp-2">{item.productName}</p>
+                      <p className="text-xs text-gray-500 mt-1">Qty: {item.quantity}</p>
+                      <p className="text-sm font-bold text-green-600 mt-1">
+                        {item.price ? `$${(item.price * item.quantity).toLocaleString()}` : ""}
+                      </p>
+                    </div>
+                  </Grid>
+
+                  {/* Remove Button */}
+                  <Grid item xs={2} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start" }}>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await axios.delete(`http://localhost:8080/api/cartItem/${item.id}`, {
+                            headers: { Authorization: `Bearer ${jwt}` },
+                          });
+                          fetchCart();
+                        } catch (error) {
+                          console.error("Error deleting cart item:", error);
+                        }
+                      }}
+                      className="hover:bg-red-50 p-1 rounded transition-colors"
+                    >
+                      <XMarkIcon className="w-5 h-5 text-gray-400 hover:text-red-500" />
+                    </button>
+                  </Grid>
+                </Grid>
+              </div>
+            ))}
+          </div>
         ) : (
-          <p>Your cart is empty</p>
+          <div className="text-center py-12">
+            <ShoppingCartOutlinedIcon sx={{ fontSize: 60, color: '#9CA3AF' }} />
+            <p className="text-gray-500 mt-3">Your cart is empty</p>
+          </div>
         )}
+      </div>
 
-        <div className="flex justify-between mt-5 text-lg font-semibold">
-          <span>Total:</span>
-          <span>{cart.totalPrice?.toLocaleString("vi-VN") || 0} VND</span>
+      {/* Footer with Total and Buttons */}
+      <div className="border-t bg-gray-50 p-6 space-y-4">
+        <div className="flex justify-between items-center text-lg font-bold">
+          <span className="text-gray-700">Total:</span>
+          <span className="text-green-600">
+            ${cart.cartItems?.reduce((sum, item) => sum + (item.price * item.quantity || 0), 0).toLocaleString() || 0}
+          </span>
         </div>
 
-        <div className="mt-5 space-y-3">
-          <button
-            onClick={() => navigate("/checkout?step=2")}
-            className="w-full py-2 px-4 bg-purple-600 text-white font-bold uppercase"
-          >
-            Checkout
-          </button>
-          <button
-            onClick={() => navigate("/cart")}
-            className="w-full py-2 px-4 border border-gray-800 text-black font-bold uppercase"
-          >
-            View Cart
-          </button>
-        </div>
+        <button
+          onClick={() => { navigate("/checkout?step=2"); toggleDrawer(anchor, false)(); }}
+          className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold uppercase rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          disabled={!cart.cartItems || cart.cartItems.length === 0}
+        >
+          Checkout
+        </button>
+
+        <button
+          onClick={() => { navigate("/cart"); toggleDrawer(anchor, false)(); }}
+          className="w-full py-3 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-300 rounded-md transition-colors"
+        >
+          View Cart
+        </button>
       </div>
     </Box>
   );
@@ -186,7 +204,7 @@ export default function Navigation() {
           >
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
-          <div onClick={() => navigate("/")} className="ml-4 flex items-center">
+          <div onClick={() => navigate("/")} className="ml-4 flex items-center cursor-pointer">
             <span className="text-2xl font-semibold text-green-500">Plant</span>
             <span className="text-2xl font-semibold text-brown-500">Nest</span>
           </div>
@@ -228,7 +246,7 @@ export default function Navigation() {
             <div key={anchor}>
               <ShoppingCartOutlinedIcon
                 onClick={toggleDrawer(anchor, true)}
-                className="h-8 w-6 cursor-pointer text-gray-400"
+                className="h-8 w-6 cursor-pointer text-gray-400 hover:text-gray-600"
               />
               <Drawer
                 anchor={anchor}
