@@ -33,6 +33,11 @@ const CategoryModal = ({ category, categories, onClose, onCreate, onUpdate }) =>
             alert('Cấp độ phải lớn hơn 0');
             return;
         }
+        // **Validation danh mục cha**
+        if (formData.level > 1 && !formData.parentCategoryId) {
+            alert('Vui lòng chọn danh mục cha cho danh mục cấp 2 trở lên');
+            return;
+        }
 
         setLoading(true);
         try {

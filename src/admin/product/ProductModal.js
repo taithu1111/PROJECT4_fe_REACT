@@ -58,8 +58,8 @@ const ProductModal = ({ product, onClose, onSave }) => {
             quantity: parseInt(formData.quantity),
             firstLevelCategory: formData.firstLevelCategory,
             secondLevelCategory: formData.secondLevelCategory,
-            colors: formData.colors.map(c => ({ color: c })),
-            images: formData.images.map(url => ({ url }))
+            colors: formData.colors.map(c => ({ color_name: c })),
+            images: formData.images.map(imageUrl => ({ imageUrl }))
         };
         console.log('Submitting product data:', payload);
 

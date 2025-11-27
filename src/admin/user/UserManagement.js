@@ -45,7 +45,7 @@ const UserManagement = () => {
             ));
         } catch (err) {
             console.error('Error toggling user status:', err);
-            alert('Không thể thay đổi trạng thái người dùng');
+            alert('Không thể thay đổi trạng thái người dùng là ADMIN');
         }
     };
 
