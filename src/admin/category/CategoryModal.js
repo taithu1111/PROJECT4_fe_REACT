@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 
 const CategoryModal = ({ category, categories, onClose, onCreate, onUpdate }) => {
     const [formData, setFormData] = useState({
-        categoryName: category?.categoryName || '',
+        name: category?.name || '',
         level: category?.level || 1,
-        parentCategoryId: category?.parentCategoryId || null
+        parentId: category?.parentCategoryId || null
     });
     const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ const CategoryModal = ({ category, categories, onClose, onCreate, onUpdate }) =>
         e.preventDefault();
 
         // Validation
-        if (!formData.categoryName.trim()) {
+        if (!formData.name.trim()) {
             alert('Vui lòng nhập tên danh mục');
             return;
         }
@@ -38,9 +38,9 @@ const CategoryModal = ({ category, categories, onClose, onCreate, onUpdate }) =>
         try {
             // Prepare data for API
             const categoryData = {
-                categoryName: formData.categoryName.trim(),
+                name: formData.name.trim(),
                 level: parseInt(formData.level),
-                parentCategoryId: formData.parentCategoryId || null
+                parentId: formData.parentCategoryId || null
             };
 
             if (category) {
@@ -82,8 +82,8 @@ const CategoryModal = ({ category, categories, onClose, onCreate, onUpdate }) =>
                         </label>
                         <input
                             type="text"
-                            value={formData.categoryName}
-                            onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2d2d2d]"
                             placeholder="Nhập tên danh mục"
                             disabled={loading}
@@ -128,7 +128,7 @@ const CategoryModal = ({ category, categories, onClose, onCreate, onUpdate }) =>
                                 .filter(cat => cat.level < formData.level)
                                 .map(cat => (
                                     <option key={cat.id} value={cat.id}>
-                                        {cat.categoryName} (Cấp {cat.level})
+                                        {cat.name} (Cấp {cat.level})
                                     </option>
                                 ))}
                         </select>

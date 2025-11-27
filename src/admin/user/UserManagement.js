@@ -1,6 +1,6 @@
 // src/admin/user/UserManagement.js
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Plus, Search, CheckCircle, XCircle, RefreshCw, LockIcon } from 'lucide-react';
 import UserModal from './UserModal';
 import AdminUserService from '../api/AdminUserService';
 
@@ -165,7 +165,7 @@ const UserManagement = () => {
                                     </td>
                                     <td className="px-6 py-4 text-sm">
                                         <div className="flex gap-2">
-                                            <button
+                                            {/* <button
                                                 onClick={() => { setEditingUser(user); setShowModal(true); }}
                                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                             >
@@ -173,6 +173,11 @@ const UserManagement = () => {
                                             </button>
                                             <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                                 <Trash2 size={16} />
+                                            </button> */}
+                                            <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                onClick={() => handleToggleStatus(user.id)}>
+
+                                                <LockIcon size={16} />
                                             </button>
                                         </div>
                                     </td>

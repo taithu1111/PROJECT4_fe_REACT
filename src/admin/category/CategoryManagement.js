@@ -65,7 +65,7 @@ const CategoryManagement = () => {
 
     const getCategoryNameById = (id) => {
         const category = categories.find(cat => cat.id === id);
-        return category ? category.categoryName : '-';
+        return category ? category.name : '-';
     };
 
     if (loading && categories.length === 0) {

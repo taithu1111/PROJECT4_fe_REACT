@@ -25,6 +25,20 @@ const AdminOrderService = {
             throw error;
         }
     },
+    // Confirm order
+    placedOrder: async (orderId) => {
+        try {
+            const response = await axios.put(
+                `${API_BASE_URL}/${orderId}/place`,
+                {},
+                { headers: getAuthHeader() }
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error confirming order:', error);
+            throw error;
+        }
+    },
 
     // Confirm order
     confirmOrder: async (orderId) => {

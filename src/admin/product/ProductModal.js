@@ -1,29 +1,57 @@
 // src/admin/product/ProductModal.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import AdminCategoryService from '../api/AdminCategoryService';
 
 const ProductModal = ({ product, onClose, onSave }) => {
+    const [categories, setCategories] = useState([]);
 
     const [formData, setFormData] = useState({
-        title: product?.title || '',
-        description: product?.description || '',
-        brand: product?.brand || '',
-        price: product?.price || 0,
-        quantity: product?.quantity || 0,
-        firstLevelCategory: product?.firstLevelCategory || '',
-        secondLevelCategory: product?.secondLevelCategory || '',
-        colors: product?.colors || [],      // array string
-        images: product?.images || []       // array object: { url }
+        productName: '',
+        description: '',
+        brand: '',
+        price: 0,
+        quantity: 0,
+        firstLevelCategory: '',
+        secondLevelCategory: '',
+        colors: [],
+        images: []
     });
 
     const [newColor, setNewColor] = useState('');
     const [newImageUrl, setNewImageUrl] = useState('');
 
+    useEffect(() => {
+        fetchCategories();
+        console.log('Editing product:', product);
+        if (product) {
+            // Khởi tạo formData khi edit
+            setFormData({
+                productName: product.productName || '',
+                description: product.description || '',
+                brand: product.brand || '',
+                price: product.price || 0,
+                quantity: product.quantity || 0,
+                firstLevelCategory: product.category.parent_category.category_name || '',
+                secondLevelCategory: product.category.category_name || '',
+                colors: product.productColors || [],
+                images: product.images || []
+            });
+        }
+    }, [product]);
+
+    const fetchCategories = async () => {
+        try {
+            const data = await AdminCategoryService.getAllCategories();
+            setCategories(data || []);
+        } catch (err) {
+            console.error('Error fetching categories:', err);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // build req body đúng CreateProductRequest
         const payload = {
-            title: formData.title,
+            title: formData.productName,
             description: formData.description,
             brand: formData.brand,
             price: parseInt(formData.price),
@@ -33,13 +61,13 @@ const ProductModal = ({ product, onClose, onSave }) => {
             colors: formData.colors.map(c => ({ color: c })),
             images: formData.images.map(url => ({ url }))
         };
+        console.log('Submitting product data:', payload);
 
         if (product) {
             await onSave(product.id, payload);
         } else {
             await onSave(payload);
         }
-
         onClose();
     };
 
@@ -65,6 +93,19 @@ const ProductModal = ({ product, onClose, onSave }) => {
         setFormData({ ...formData, images: formData.images.filter(x => x !== url) });
     };
 
+    // Lọc second-level category theo first-level đã chọn
+    let filteredSecondLevelCategories = categories.filter(
+        cat =>
+            cat.level === 2 &&
+            categories.find(p => p.id === cat.parentId)?.name === formData.firstLevelCategory
+    );
+
+    // Nếu secondLevelCategory hiện tại chưa có trong filtered, thêm tạm để hiển thị
+    if (formData.secondLevelCategory &&
+        !filteredSecondLevelCategories.find(c => c.name === formData.secondLevelCategory)) {
+        filteredSecondLevelCategories.push({ id: -1, name: formData.secondLevelCategory });
+    }
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             onClick={onClose}>
@@ -81,8 +122,8 @@ const ProductModal = ({ product, onClose, onSave }) => {
                     <div>
                         <label className="block font-medium">Tên sản phẩm *</label>
                         <input
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            value={formData.productName}
+                            onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
                             required
                             className="w-full px-3 py-2 border rounded"
                         />
@@ -137,28 +178,44 @@ const ProductModal = ({ product, onClose, onSave }) => {
                         />
                     </div>
 
-                    {/* Category 1 */}
+                    {/* First Level Category */}
                     <div>
                         <label className="block font-medium">First Level Category *</label>
                         <input
+                            list="first-level-categories"
                             value={formData.firstLevelCategory}
-                            onChange={(e) => setFormData({ ...formData, firstLevelCategory: e.target.value })}
-                            placeholder="example: Electronics"
+                            onChange={(e) =>
+                                setFormData({ ...formData, firstLevelCategory: e.target.value })
+                            }
+                            placeholder="Chọn hoặc nhập category"
                             required
                             className="w-full px-3 py-2 border rounded"
                         />
+                        <datalist id="first-level-categories">
+                            {categories.filter(cat => cat.level === 1).map(cat => (
+                                <option key={cat.id} value={cat.name} />
+                            ))}
+                        </datalist>
                     </div>
 
-                    {/* Category2 */}
+                    {/* Second Level Category */}
                     <div>
                         <label className="block font-medium">Second Level Category *</label>
                         <input
+                            list="second-level-categories"
                             value={formData.secondLevelCategory}
-                            onChange={(e) => setFormData({ ...formData, secondLevelCategory: e.target.value })}
-                            placeholder="example: Laptop / Phone"
+                            onChange={(e) =>
+                                setFormData({ ...formData, secondLevelCategory: e.target.value })
+                            }
+                            placeholder="Chọn hoặc nhập category"
                             required
                             className="w-full px-3 py-2 border rounded"
                         />
+                        <datalist id="second-level-categories">
+                            {filteredSecondLevelCategories.map(cat => (
+                                <option key={cat.id} value={cat.name} />
+                            ))}
+                        </datalist>
                     </div>
 
                     {/* COLORS */}
@@ -179,7 +236,6 @@ const ProductModal = ({ product, onClose, onSave }) => {
                                 +
                             </button>
                         </div>
-
                         <div className="flex gap-2 flex-wrap">
                             {formData.colors.map(c => (
                                 <span key={c} className="px-2 py-1 bg-gray-200 rounded flex items-center gap-2">
@@ -214,7 +270,6 @@ const ProductModal = ({ product, onClose, onSave }) => {
                                 +
                             </button>
                         </div>
-
                         <ul className="space-y-1">
                             {formData.images.map(url => (
                                 <li key={url} className="flex justify-between items-center bg-gray-50 p-2 rounded">

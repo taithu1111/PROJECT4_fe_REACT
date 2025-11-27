@@ -1,9 +1,8 @@
 // src/admin/order/OrderManagement.js
 import React, { useState, useEffect } from 'react';
-import { Edit, Search, ShoppingCart, RefreshCw } from 'lucide-react';
+import { Edit, Search, ShoppingCart, RefreshCw, Trash2, ArrowRight, CheckCircle, Truck } from 'lucide-react';
 import OrderDetailModal from './OrderDetailModal';
 import AdminOrderService from '../api/AdminOrderService';
-
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -20,11 +19,22 @@ const OrderManagement = () => {
     const statusOptions = [
         { value: 'all', label: 'Tất cả' },
         { value: 'PENDING', label: 'Chờ xử lý', color: 'bg-yellow-100 text-yellow-800' },
+        { value: 'PLACED', label: 'Đã đặt', color: 'bg-yellow-100 text-yellow-800' },
         { value: 'CONFIRMED', label: 'Đã xác nhận', color: 'bg-blue-100 text-blue-800' },
         { value: 'SHIPPED', label: 'Đang giao', color: 'bg-purple-100 text-purple-800' },
         { value: 'DELIVERED', label: 'Đã giao', color: 'bg-green-100 text-green-800' },
         { value: 'CANCELLED', label: 'Đã hủy', color: 'bg-red-100 text-red-800' }
     ];
+
+    // Bản đồ trạng thái tiếp theo hợp lệ
+    const nextStatusMap = {
+        PENDING: 'PLACED',
+        PLACED: 'CONFIRMED',
+        CONFIRMED: 'SHIPPED',
+        SHIPPED: 'DELIVERED',
+        DELIVERED: null,
+        CANCELLED: null
+    };
 
     useEffect(() => {
         fetchOrders();
@@ -49,6 +59,9 @@ const OrderManagement = () => {
         try {
             let updatedOrder;
             switch (newStatus) {
+                case 'PLACED':
+                    updatedOrder = await AdminOrderService.placedOrder(orderId);
+                    break;
                 case 'CONFIRMED':
                     updatedOrder = await AdminOrderService.confirmOrder(orderId);
                     break;
@@ -65,9 +78,7 @@ const OrderManagement = () => {
                     return;
             }
 
-            setOrders(orders.map(order =>
-                order.id === orderId ? updatedOrder : order
-            ));
+            setOrders(orders.map(order => order.id === orderId ? updatedOrder : order));
             setSelectedOrder(null);
         } catch (err) {
             console.error('Error updating order status:', err);
@@ -160,11 +171,14 @@ const OrderManagement = () => {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng tiền</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái tiếp theo</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
                                 {filteredOrders.map(order => {
                                     const status = statusOptions.find(s => s.value === order.orderStatus);
+                                    const nextStatus = nextStatusMap[order.orderStatus];
+
                                     return (
                                         <tr key={order.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.orderId}</td>
@@ -180,13 +194,44 @@ const OrderManagement = () => {
                                                     {status?.label}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm">
+                                            <td className="px-6 py-4 text-sm flex gap-2">
+                                                {/* Mở modal chi tiết */}
                                                 <button
                                                     onClick={() => setSelectedOrder(order)}
                                                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 >
                                                     <Edit size={16} />
                                                 </button>
+
+
+
+                                                {/* Nút hủy */}
+                                                {order.orderStatus !== 'DELIVERED' && order.orderStatus !== 'CANCELLED' && (
+                                                    <button
+                                                        onClick={() => handleStatusChange(order.id, 'CANCELLED')}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                )}
+                                            </td>
+                                            <td>
+                                                {/* Nút chuyển trạng thái tiếp theo */}
+                                                {nextStatus && (
+                                                    <button
+                                                        onClick={() => handleStatusChange(order.id, nextStatus)}
+                                                        className="flex items-center gap-1 px-2 py-1 text-white text-xs rounded bg-green-500 hover:bg-green-600"
+                                                    >
+                                                        {/* Icon tương ứng */}
+                                                        {nextStatus === 'PLACED' && <ArrowRight size={12} />}
+                                                        {nextStatus === 'CONFIRMED' && <CheckCircle size={12} />}
+                                                        {nextStatus === 'SHIPPED' && <Truck size={12} />}
+                                                        {nextStatus === 'DELIVERED' && <CheckCircle size={12} />}
+
+                                                        {/* Label */}
+                                                        {statusOptions.find(s => s.value === nextStatus)?.label}
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     );
