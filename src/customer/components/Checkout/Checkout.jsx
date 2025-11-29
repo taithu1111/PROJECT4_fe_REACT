@@ -6,10 +6,10 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import DeliveryAddressForm from './DeliveryAddressForm';
 import OrderSummary from './OrderSummary';
-import axios from 'axios';
-import { getAuthHeaders } from "../../../api/GetAuthHeaders";
+import { createOrder } from '../../../State/Order/Action';
 
 const steps = ['Login', 'Add delivery address', 'Order summary', 'Payment'];
 
@@ -17,6 +17,8 @@ export default function Checkout() {
     const [activeStep, setActiveStep] = React.useState(0);
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { isLoading, error } = useSelector((store) => store.order);
 
     const querySearch = new URLSearchParams(location.search);
     const step = querySearch.get("step");
@@ -31,29 +33,13 @@ export default function Checkout() {
 
     const handleCreateOrder = async (address) => {
         try {
-            const payload = {
-                city: address.city,
-                street_address: address.streetAddress,
-                zip_code: address.zipCode
-            };
-
-            // Gọi API tạo order
-            const res = await axios.post(
-                "http://localhost:8080/api/orders/",
-                payload,
-                { headers: getAuthHeaders() }
-            );
-
-            console.log("Order created:", res.data);
-
-            // Nếu tạo thành công, chuyển sang step 3 (Order summary / Payment)
+            await dispatch(createOrder(address));
+            console.log("Order created successfully");
+            // Navigate to order summary/payment step
             navigate("/checkout?step=3");
         } catch (err) {
-            // Log lỗi chi tiết
-            console.error("Error creating order:", err.response?.data || err.message);
-
-            // Có thể hiện thông báo cho user
-            alert("Đặt hàng thất bại! Vui lòng thử lại.");
+            console.error("Error creating order:", err.message);
+            alert("Order creation failed! Please try again.");
         }
     };
 

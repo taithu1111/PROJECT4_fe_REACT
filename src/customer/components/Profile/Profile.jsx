@@ -35,6 +35,11 @@ const Profile = () => {
         lastName: "",
         email: "",
         mobile: "", // CHANGED from phone → mobile
+        address: {
+            streetAddress: "",
+            city: "",
+            zipCode: "",
+        },
     });
     const [formErrors, setFormErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState("");
@@ -65,6 +70,11 @@ const Profile = () => {
                 lastName: user.lastName || "",
                 email: user.email || "",
                 mobile: user.mobile || "", // CHANGED: load user.mobile
+                address: {
+                    streetAddress: user.addresses?.[0]?.streetAddress || "",
+                    city: user.addresses?.[0]?.city || "",
+                    zipCode: user.addresses?.[0]?.zipCode || "",
+                },
             });
         }
     }, [user]);
@@ -79,6 +89,15 @@ const Profile = () => {
         const { name, value } = e.target;
         setPasswordData((prev) => ({ ...prev, [name]: value }));
         if (passwordErrors[name]) setPasswordErrors((prev) => ({ ...prev, [name]: "" }));
+    };
+
+    const handleAddressChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            address: { ...prev.address, [name]: value },
+        }));
+        if (formErrors[name]) setFormErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
     const validateForm = () => {
@@ -166,6 +185,11 @@ const Profile = () => {
                 lastName: user.lastName || "",
                 email: user.email || "",
                 mobile: user.mobile || "", // CHANGED
+                address: {
+                    streetAddress: user.addresses?.[0]?.streetAddress || "",
+                    city: user.addresses?.[0]?.city || "",
+                    zipCode: user.addresses?.[0]?.zipCode || "",
+                },
             });
         }
         setFormErrors({});
@@ -281,6 +305,57 @@ const Profile = () => {
                             disabled={!editMode}
                             error={!!formErrors.mobile}
                             helperText={formErrors.mobile || "Optional: 10-15 digits"}
+                            InputProps={{ readOnly: !editMode }}
+                        />
+                    </Grid>
+
+                    {/* Address Fields */}
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mt: 2, mb: 1 }}>
+                            Address Information
+                        </Typography>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Street Address"
+                            name="streetAddress"
+                            multiline
+                            rows={2}
+                            value={formData.address.streetAddress}
+                            onChange={handleAddressChange}
+                            disabled={!editMode}
+                            error={!!formErrors.streetAddress}
+                            helperText={formErrors.streetAddress}
+                            InputProps={{ readOnly: !editMode }}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="City"
+                            name="city"
+                            value={formData.address.city}
+                            onChange={handleAddressChange}
+                            disabled={!editMode}
+                            error={!!formErrors.city}
+                            helperText={formErrors.city}
+                            InputProps={{ readOnly: !editMode }}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            fullWidth
+                            label="Zip Code"
+                            name="zipCode"
+                            value={formData.address.zipCode}
+                            onChange={handleAddressChange}
+                            disabled={!editMode}
+                            error={!!formErrors.zipCode}
+                            helperText={formErrors.zipCode}
                             InputProps={{ readOnly: !editMode }}
                         />
                     </Grid>

@@ -159,7 +159,10 @@ export default function Navigation() {
         </div>
 
         <button
-          onClick={() => { navigate("/checkout?step=2"); toggleDrawer(anchor, false)(); }}
+          onClick={() => {
+            setState({ ...state, [anchor]: false });
+            navigate("/checkout?step=2");
+          }}
           className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold uppercase rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           disabled={!cart.cartItems || cart.cartItems.length === 0}
         >
@@ -167,7 +170,10 @@ export default function Navigation() {
         </button>
 
         <button
-          onClick={() => { navigate("/cart"); toggleDrawer(anchor, false)(); }}
+          onClick={() => {
+            setState({ ...state, [anchor]: false });
+            navigate("/cart");
+          }}
           className="w-full py-3 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-300 rounded-md transition-colors"
         >
           View Cart

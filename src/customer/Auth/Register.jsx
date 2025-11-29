@@ -14,6 +14,12 @@ const Register = ({ onSwitchMode }) => {
     lastName: "",
     email: "",
     password: "",
+    mobile: "",
+    address: {
+      streetAddress: "",
+      city: "",
+      zipCode: "",
+    },
   });
 
   const [errors, setErrors] = useState({});
@@ -24,6 +30,9 @@ const Register = ({ onSwitchMode }) => {
 
   // 🔹 Email regex requirement
   const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+  // 🔹 Phone regex requirement
+  const phoneRegex = /^[0-9]{10,15}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,6 +58,24 @@ const Register = ({ onSwitchMode }) => {
         "Password must be at least 8 characters and include uppercase, lowercase, and a number";
     }
 
+    // 🔹 Phone validation
+    if (!formData.mobile) {
+      validationErrors.mobile = "Phone number is required";
+    } else if (!phoneRegex.test(formData.mobile)) {
+      validationErrors.mobile = "Phone must be 10-15 digits";
+    }
+
+    // 🔹 Address validation
+    if (!formData.address.streetAddress) {
+      validationErrors.streetAddress = "Street address is required";
+    }
+    if (!formData.address.city) {
+      validationErrors.city = "City is required";
+    }
+    if (!formData.address.zipCode) {
+      validationErrors.zipCode = "Zip code is required";
+    }
+
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
@@ -65,6 +92,14 @@ const Register = ({ onSwitchMode }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      address: { ...prev.address, [name]: value },
+    }));
   };
 
   return (
@@ -117,6 +152,20 @@ const Register = ({ onSwitchMode }) => {
           <Grid item xs={12}>
             <TextField
               required
+              id="mobile"
+              name="mobile"
+              label="Phone Number"
+              fullWidth
+              value={formData.mobile}
+              onChange={handleInputChange}
+              error={!!errors.mobile}
+              helperText={errors.mobile || "10-15 digits"}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              required
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
@@ -135,6 +184,57 @@ const Register = ({ onSwitchMode }) => {
                   </InputAdornment>
                 )
               }}
+            />
+          </Grid>
+
+          {/* Address Fields */}
+          <Grid item xs={12}>
+            <Typography variant="subtitle1" className="font-semibold text-gray-700 mb-2">
+              Address Information
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              required
+              id="streetAddress"
+              name="streetAddress"
+              label="Street Address"
+              fullWidth
+              multiline
+              rows={2}
+              value={formData.address.streetAddress}
+              onChange={handleAddressChange}
+              error={!!errors.streetAddress}
+              helperText={errors.streetAddress}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              id="city"
+              name="city"
+              label="City"
+              fullWidth
+              value={formData.address.city}
+              onChange={handleAddressChange}
+              error={!!errors.city}
+              helperText={errors.city}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              required
+              id="zipCode"
+              name="zipCode"
+              label="Zip Code"
+              fullWidth
+              value={formData.address.zipCode}
+              onChange={handleAddressChange}
+              error={!!errors.zipCode}
+              helperText={errors.zipCode}
             />
           </Grid>
 
