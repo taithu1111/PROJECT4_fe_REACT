@@ -65,15 +65,24 @@ const Profile = () => {
 
     useEffect(() => {
         if (user) {
+            // Debug: Check if addresses are being loaded
+            console.log("User data:", user);
+            console.log("User addresses:", user.addresses);
+
+            // Get the first address if it exists
+            const primaryAddress = user.addresses && user.addresses.length > 0 ? user.addresses[0] : null;
+
+            console.log("Primary address:", primaryAddress);
+
             setFormData({
                 firstName: user.firstName || "",
                 lastName: user.lastName || "",
                 email: user.email || "",
                 mobile: user.mobile || "", // CHANGED: load user.mobile
                 address: {
-                    streetAddress: user.addresses?.[0]?.streetAddress || "",
-                    city: user.addresses?.[0]?.city || "",
-                    zipCode: user.addresses?.[0]?.zipCode || "",
+                    streetAddress: primaryAddress?.streetAddress || "",
+                    city: primaryAddress?.city || "",
+                    zipCode: primaryAddress?.zipCode || "",
                 },
             });
         }
@@ -180,15 +189,17 @@ const Profile = () => {
 
     const handleCancel = () => {
         if (user) {
+            const primaryAddress = user.addresses && user.addresses.length > 0 ? user.addresses[0] : null;
+
             setFormData({
                 firstName: user.firstName || "",
                 lastName: user.lastName || "",
-                email: user.email || "",
+                email: user.email || "", // CHANGED
                 mobile: user.mobile || "", // CHANGED
                 address: {
-                    streetAddress: user.addresses?.[0]?.streetAddress || "",
-                    city: user.addresses?.[0]?.city || "",
-                    zipCode: user.addresses?.[0]?.zipCode || "",
+                    streetAddress: primaryAddress?.streetAddress || "",
+                    city: primaryAddress?.city || "",
+                    zipCode: primaryAddress?.zipCode || "",
                 },
             });
         }

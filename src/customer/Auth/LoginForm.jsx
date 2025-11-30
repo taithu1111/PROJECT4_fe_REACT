@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login, getUser } from "../../State/Auth/Action";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
   const dispatch = useDispatch();
@@ -34,11 +36,28 @@ const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
       const token = await dispatch(login(formData));
       if (token) {
         await dispatch(getUser(token));
+        toast.success("Login successful! Welcome back.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+        });
         onLoginSuccess(); // close modal
         navigate("/"); // redirect home
       }
     } catch (err) {
-      alert("Login failed: " + err.message);
+      toast.error(err.message || "Login failed. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
     }
   };
 
@@ -49,6 +68,7 @@ const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
 
   return (
     <div>
+      <ToastContainer />
       <Typography variant="h5" align="center" gutterBottom>
         Login
       </Typography>

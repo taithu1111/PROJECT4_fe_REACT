@@ -37,7 +37,39 @@ export const register = (userData) => async (dispatch) => {
 
     return user.message;
   } catch (error) {
-    const message = error.response?.data?.message || error.message;
+    let message = 'Registration failed. Please try again.';
+
+    // Handle ErrorDetails format (e.g., "Email is already exists with another account")
+    if (error.response?.data?.message) {
+      message = error.response.data.message;
+    }
+    // Handle validation error map format from MethodArgumentNotValidException
+    else if (error.response?.data) {
+      const errorData = error.response.data;
+      // Check if it's a validation errors map (object without message field)
+      if (typeof errorData === 'object' && !errorData.message && !errorData.details) {
+        const errorMessages = Object.entries(errorData)
+          .map(([field, msg]) => `${field}: ${msg}`)
+          .join(', ');
+        message = errorMessages || 'Please check your input and try again.';
+      } else if (error.response?.status) {
+        // Provide user-friendly messages based on status code
+        switch (error.response.status) {
+          case 409:
+            message = 'Email already exists. Please use a different email or login.';
+            break;
+          case 400:
+            message = 'Invalid registration data. Please check your input.';
+            break;
+          case 500:
+            message = 'Server error. Please try again later.';
+            break;
+          default:
+            message = 'Registration failed. Please try again.';
+        }
+      }
+    }
+
     dispatch({ type: REGISTER_FAILURE, payload: message });
     throw new Error(message);
   }
@@ -61,7 +93,28 @@ export const login = (userData) => async (dispatch) => {
 
     return user.token;
   } catch (error) {
-    const message = error.response?.data?.message || error.message;
+    let message = 'Login failed. Please try again.';
+
+    // Extract error message from backend ErrorDetails format
+    if (error.response?.data?.message) {
+      message = error.response.data.message;
+    } else if (error.response?.status) {
+      // Provide user-friendly messages based on status code if backend message is not available
+      switch (error.response.status) {
+        case 401:
+          message = 'Invalid email or password. Please check your credentials.';
+          break;
+        case 403:
+          message = 'Access forbidden. Please contact support.';
+          break;
+        case 500:
+          message = 'Server error. Please try again later.';
+          break;
+        default:
+          message = 'Login failed. Please try again.';
+      }
+    }
+
     dispatch({ type: LOGIN_FAILURE, payload: message });
     throw new Error(message);
   }

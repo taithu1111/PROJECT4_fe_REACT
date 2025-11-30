@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { register } from "../../State/Auth/Action";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = ({ onSwitchMode }) => {
   const dispatch = useDispatch();
@@ -81,10 +83,29 @@ const Register = ({ onSwitchMode }) => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         const message = await dispatch(register(formData));
-        alert(message || "Registration successful! Please login.");
-        onSwitchMode(); // switch to login inside modal
+        toast.success(message || "Registration successful! Please login.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+        });
+        // Switch to login after successful registration
+        setTimeout(() => {
+          onSwitchMode(); // switch to login inside modal
+        }, 1500);
       } catch (error) {
-        alert("Registration failed: " + error.message);
+        toast.error(error.message || "Registration failed. Please try again.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+        });
       }
     }
   };
@@ -104,6 +125,7 @@ const Register = ({ onSwitchMode }) => {
 
   return (
     <div>
+      <ToastContainer />
       <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "25px" }}>
         Register
       </Typography>
