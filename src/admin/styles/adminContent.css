@@ -1,0 +1,9 @@
+.admin-content {
+    margin: 20px 20px 20px 20px  ;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.sidebar-container{
+    border-radius: 10px;
+    margin-right: 10px;
+}

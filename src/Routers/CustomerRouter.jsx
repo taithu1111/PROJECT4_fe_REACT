@@ -13,6 +13,7 @@ import axios from "axios";
 import Contact from "../customer/components/Contact/Contact";
 import AboutUs from "../customer/components/AboutUs/AboutUs";
 import SearchResults from "../customer/components/Product/SearchResults";
+import AdminContent from "../admin/AdminContent";
 import ResetPasswordPage from "../customer/Auth/ResetPasswordPage";
 import Profile from "../customer/components/Profile/Profile";
 
@@ -61,6 +62,18 @@ const CustomerRouter = () => {
         />
       </div>
       <Routes>
+        <Route
+          path="/admin"
+          element={<AdminContent />}
+        ></Route>
+        <Route
+          path="/login"
+          element={<HomePage data={data} handleClick={handleClick} />}
+        ></Route>
+        <Route
+          path="/register"
+          element={<HomePage data={data} handleClick={handleClick} />}
+        ></Route>
 
         {show ? (
           <Route
