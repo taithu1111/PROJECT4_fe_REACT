@@ -131,12 +131,12 @@ const ReviewManagement = () => {
                                         <p className="text-sm text-gray-900">{review.review}</p>
                                     </div>
                                     <div className="flex gap-2 ml-4">
-                                        <button
+                                        {/* <button
                                             onClick={() => setSelectedReview(review)}
                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                         >
                                             <Edit size={16} />
-                                        </button>
+                                        </button> */}
                                         <button
                                             onClick={() => handleDeleteReview(review.id)}
                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"

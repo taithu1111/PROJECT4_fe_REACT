@@ -168,12 +168,12 @@ const RatingManagement = () => {
                                         </td>
                                         <td className="px-6 py-4 text-sm">
                                             <div className="flex gap-2">
-                                                <button
+                                                {/* <button
                                                     onClick={() => setSelectedRating(rating)}
                                                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 >
                                                     <Edit size={16} />
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     onClick={() => handleDeleteRating(rating.id)}
                                                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
