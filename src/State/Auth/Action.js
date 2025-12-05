@@ -27,7 +27,7 @@ export const register = (userData) => async (dispatch) => {
     const user = response.data;
 
     if (user.token) {
-      localStorage.setItem("jwt", user.token);
+      // localStorage.setItem("jwt", user.token);
     }
 
     dispatch({
