@@ -1,46 +1,113 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
 import OrderTracker from "./OrderTracker";
 import Grid from "@mui/material/Grid";
-import { Box } from "@mui/material";
+import { Box, Button, CircularProgress, Typography, Alert } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import { getOrderById, confirmedOrder } from "../../../State/Order/Action";
 
 const OrderDetails = () => {
+  const dispatch = useDispatch();
+  const { orderId } = useParams();
+  const { order, isLoading, error } = useSelector((store) => store.order);
+
+  useEffect(() => {
+    dispatch(getOrderById(orderId));
+  }, [dispatch, orderId]);
+
+  const handleConfirmOrder = () => {
+    dispatch(confirmedOrder(orderId));
+  };
+
+  const getActiveStep = (status) => {
+    switch (status) {
+      case "PLACED":
+      case "PENDING":
+        return 0;
+      case "CONFIRMED":
+        return 1;
+      case "SHIPPED":
+        return 2;
+      case "OUT_FOR_DELIVERY":
+        return 3;
+      case "DELIVERED":
+        return 4;
+      default:
+        return 0;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-5 lg:px-24">
+        <Alert severity="error">{error}</Alert>
+      </div>
+    );
+  }
+
+  if (!order) {
+    return null;
+  }
+
   return (
     <div className="px-5 lg:px-24">
       <div>
-        <h1 className="font-bold py-7 text-lg">Dilivery Address</h1>
-        <AddressCard />
+        <h1 className="font-bold py-7 text-lg">Delivery Address</h1>
+        <AddressCard address={order.shippingAddress} />
       </div>
 
       <div className="py-20">
-        <OrderTracker activeStep={3} />
+        <OrderTracker activeStep={getActiveStep(order.orderStatus)} />
       </div>
 
+      {/* Admin or user action to confirm order - strictly for demo purposes or if user can confirm receipt */}
+      {(order.orderStatus === "PLACED" || order.orderStatus === "PENDING") && (
+        <div className="flex justify-end mb-5">
+          <Button
+            variant="contained"
+            sx={{ bgcolor: deepPurple[500], "&:hover": { bgcolor: deepPurple[700] } }}
+            onClick={handleConfirmOrder}
+          >
+            Confirm Order
+          </Button>
+        </div>
+      )}
+
       <Grid container className="space-y-5 " >
-        {[1, 1, 1, 1].map((item) => (
+        {order.orderItems?.map((item) => (
           <Grid
             item
             container
             className="shadow-xl rounded-md p-5 border "
             sx={{ alignItems: "center", justifyContent: "space-between" }}
+            key={item.id}
           >
             <Grid item xs={6}>
               <div className=" flex items-center space-x-4">
                 <img
                   className="w-[5rem] h-[5rem] object-cover object-top"
-                  src="https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/27fd4c90-314f-4609-8f36-d7fca3b488f1/jordan-dri-fit-sport-golf-polo-pclvPv.png"
-                  alt=""
+                  src={item.product?.imageUrl || item.imageUrl || ""}
+                  alt={item.product?.title || item.productName || "Product"}
                 />
                 <div className="space-y-2 ml-5">
-                  <p className="font-semibold">Men Shirt Nike </p>
+                  <p className="font-semibold">{item.product?.title || item.productName}</p>
                   <p className="space-x-5 opacity-60 text-xs font-semibold">
-                    <span>Color: Black</span>
-                    <span>Size: M</span>
+                    <span>Color: {item.product?.color || item.color}</span>
+                    <span>Size: {item.size}</span>
                   </p>
-                  <p>Seller: Oriz</p>
-                  <p>$199</p>
+                  <p>Seller: {item.product?.brand || item.brand}</p>
+                  <p>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}</p>
                 </div>
               </div>
             </Grid>

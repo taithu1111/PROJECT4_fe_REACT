@@ -131,9 +131,9 @@ const Order = () => {
 
   const orderStatuses = [
     { label: "Pending", value: "pending", color: "#FFA726" },
-    { label: "Processing", value: "processing", color: "#42A5F5" },
+    { label: "Placed", value: "placed", color: "#42A5F5" },
+    { label: "Confirmed", value: "confirmed", color: "#66BB6A" },
     { label: "Shipped", value: "shipped", color: "#9575CD" },
-    { label: "On The Way", value: "on_the_way", color: "#7E57C2" },
     { label: "Delivered", value: "delivered", color: "#66BB6A" },
     { label: "Cancelled", value: "cancelled", color: "#EF5350" },
     { label: "Returned", value: "returned", color: "#FF7043" },

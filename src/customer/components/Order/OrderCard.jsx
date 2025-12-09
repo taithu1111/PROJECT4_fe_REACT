@@ -6,9 +6,22 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import { useDispatch } from "react-redux";
+import { deleteOrder } from "../../../State/Order/Action";
 
 const OrderCard = ({ order }) => {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const canDelete =
+    order.orderStatus === "PENDING" ||
+    order.orderStatus === "CANCELLED";
+
+  const handleDelete = () => {
+    if (!window.confirm("Delete this order?")) return;
+    dispatch(deleteOrder(order.id));
+  };
 
   // Format date
   const formatDate = (dateString) => {
@@ -64,12 +77,20 @@ const OrderCard = ({ order }) => {
         label: "Cancelled",
       };
     }
-    if (statusLower.includes("processing")) {
+    if (statusLower.includes("processing") || statusLower.includes("placed")) {
       return {
         color: "#2196f3",
         bgColor: "#e3f2fd",
         icon: <HourglassEmptyIcon fontSize="small" />,
-        label: "Processing",
+        label: "Placed",
+      };
+    }
+    if (statusLower.includes("confirmed")) {
+      return {
+        color: "#4caf50",
+        bgColor: "#e8f5e9",
+        icon: <CheckCircleOutlineIcon fontSize="small" />,
+        label: "Confirmed",
       };
     }
     // Default: Pending
@@ -117,14 +138,14 @@ const OrderCard = ({ order }) => {
             <Grid container spacing={2} key={index} className="order-item">
               <Grid item xs={3}>
                 <img
-                  src={item.product?.imageUrl || "/placeholder-image.png"}
-                  alt={item.product?.title || "Product"}
+                  src={item.product?.imageUrl || item.imageUrl || "/placeholder-image.png"}
+                  alt={item.product?.title || item.productName || "Product"}
                   className="order-item-image"
                 />
               </Grid>
               <Grid item xs={9}>
                 <Typography variant="body2" className="order-item-name">
-                  {item.product?.title || "Product"}
+                  {item.product?.title || item.productName || "Product"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   Quantity: {item.quantity}
@@ -161,6 +182,17 @@ const OrderCard = ({ order }) => {
         <Button variant="outlined" size="small">
           View Details
         </Button>
+        {canDelete && (
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleDelete}
+            sx={{ mt: 2 }}
+          >
+            Delete Order
+          </Button>
+        )}
       </Box>
     </Box>
   );

@@ -1,5 +1,6 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { confirmedOrder } from "../../../State/Order/Action";
 import { useNavigate } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
 import { Button, Paper, Typography, Divider, CircularProgress } from "@mui/material";
@@ -8,6 +9,7 @@ import { formatCurrency } from "../../../comon/formatCurrency";
 
 const OrderSummary = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { order, isLoading, error } = useSelector((store) => store.order);
 
   if (isLoading) {
@@ -177,9 +179,33 @@ const OrderSummary = () => {
               Proceed to Payment
             </Button>
 
-            <Typography variant="caption" className="text-gray-500 mt-3 block text-center">
-              Order ID: #{order.id}
-            </Typography>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                py: 1.5,
+                fontSize: '1rem',
+                fontWeight: 600,
+                bgcolor: "#9155fd",
+                "&:hover": { bgcolor: "#7c3aed" }
+              }}
+              onClick={() => {
+                dispatch(confirmedOrder(order.id))
+                  .then(() => {
+                    // Success - Navigate to a success page or show alert
+                    // Since we don't know if a dedicated success page exists, we'll use a simple alert or redirect to order details
+                    alert("Order Confirmed Successfully!");
+                    navigate(`/account/order/${order.id}`); // Redirect to order details as "Success Page"
+                  })
+                  .catch((err) => {
+                    console.error("Order confirmation failed:", err);
+                    // Error is also handled by Redux state 'error', but we can show a snackbar/alert here
+                    alert(`Order Confirmation Failed: ${err.message || "Unknown error"}`);
+                  });
+              }}
+            >
+              Confirm Order
+            </Button>
           </Paper>
         </div>
       </div>
