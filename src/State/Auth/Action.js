@@ -10,91 +10,180 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  UPDATE_USER_FAILURE,
+  UPDATE_USER_REQUEST,
+  UPDATE_USER_SUCCESS,
+  CHANGE_PASSWORD_FAILURE,
+  CHANGE_PASSWORD_REQUEST,
+  CHANGE_PASSWORD_SUCCESS,
 } from "./ActionType";
 import { API_BASE_URL } from "../../config/ApiConfig";
 
-const token = localStorage.getItem("jwt");
-
-// xu li met vl =))
-
-const registerRequest = () => ({ type: REGISTER_REQUEST });
-const registerSuccess = (user) => ({ type: REGISTER_SUCCESS, payload: user });
-const registerFailure = (error) => ({ type: REGISTER_FAILURE, payload: error });
-
+// ----- Register -----
 export const register = (userData) => async (dispatch) => {
-  dispatch(registerRequest());
-
+  dispatch({ type: REGISTER_REQUEST });
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
     const user = response.data;
-    // if (user.token) {
-    //   localStorage.setItem("jwt", user.token);
-    // }
-    console.log("user", user);
-    dispatch(registerSuccess(user.token));
+
+    if (user.token) {
+      // localStorage.setItem("jwt", user.token);
+    }
+
+    dispatch({
+      type: REGISTER_SUCCESS,
+      payload: { token: user.token, ...user },
+    });
+
     return user.message;
   } catch (error) {
-    console.log("Lỗi sever : ", error.response);
-    const message =
-      error.response?.data?.message || error.message;
+    let message = 'Registration failed. Please try again.';
 
-    dispatch(registerFailure(message));
+    // Handle ErrorDetails format (e.g., "Email is already exists with another account")
+    if (error.response?.data?.message) {
+      message = error.response.data.message;
+    }
+    // Handle validation error map format from MethodArgumentNotValidException
+    else if (error.response?.data) {
+      const errorData = error.response.data;
+      // Check if it's a validation errors map (object without message field)
+      if (typeof errorData === 'object' && !errorData.message && !errorData.details) {
+        const errorMessages = Object.entries(errorData)
+          .map(([field, msg]) => `${field}: ${msg}`)
+          .join(', ');
+        message = errorMessages || 'Please check your input and try again.';
+      } else if (error.response?.status) {
+        // Provide user-friendly messages based on status code
+        switch (error.response.status) {
+          case 409:
+            message = 'Email already exists. Please use a different email or login.';
+            break;
+          case 400:
+            message = 'Invalid registration data. Please check your input.';
+            break;
+          case 500:
+            message = 'Server error. Please try again later.';
+            break;
+          default:
+            message = 'Registration failed. Please try again.';
+        }
+      }
+    }
+
+    dispatch({ type: REGISTER_FAILURE, payload: message });
     throw new Error(message);
   }
 };
 
-const loginRequest = () => ({ type: LOGIN_REQUEST });
-const loginSuccess = (user) => ({ type: LOGIN_SUCCESS, payload: user });
-const loginFailure = (error) => ({ type: LOGIN_FAILURE, payload: error });
-
+// ----- Login -----
 export const login = (userData) => async (dispatch) => {
-  dispatch(loginRequest());
-
+  dispatch({ type: LOGIN_REQUEST });
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/signin`, userData);
     const user = response.data;
+
     if (user.token) {
       localStorage.setItem("jwt", user.token);
     }
-    console.log("user", user);
-    dispatch(loginSuccess(user.token));
-  } catch (error) {
-    const message =
-      error.response?.data?.message || error.message;
-    dispatch(registerFailure(message));
 
-    dispatch(loginFailure(message));
-    console.error("Register error:", message);
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: { token: user.token, ...user },
+    });
+
+    return user.token;
+  } catch (error) {
+    let message = 'Login failed. Please try again.';
+
+    // Extract error message from backend ErrorDetails format
+    if (error.response?.data?.message) {
+      message = error.response.data.message;
+    } else if (error.response?.status) {
+      // Provide user-friendly messages based on status code if backend message is not available
+      switch (error.response.status) {
+        case 401:
+          message = 'Invalid email or password. Please check your credentials.';
+          break;
+        case 403:
+          message = 'Access forbidden. Please contact support.';
+          break;
+        case 500:
+          message = 'Server error. Please try again later.';
+          break;
+        default:
+          message = 'Login failed. Please try again.';
+      }
+    }
+
+    dispatch({ type: LOGIN_FAILURE, payload: message });
     throw new Error(message);
   }
 };
 
-const getUserRequest = () => ({ type: GET_USER_REQUEST });
-const getUserSuccess = (user) => ({ type: GET_USER_SUCCESS, payload: user });
-const getUserFailure = (error) => ({ type: GET_USER_FAILURE, payload: error });
-
+// ----- Get User Profile -----
 export const getUser = (jwt) => async (dispatch) => {
-  dispatch(getUserRequest());
-
+  dispatch({ type: GET_USER_REQUEST });
   try {
     const response = await axios.get(`${API_BASE_URL}/api/users/profile`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+      headers: { Authorization: `Bearer ${jwt}` },
     });
 
-    const user = response.data;
-    console.log("User profile từ BE:", user);
-    dispatch(getUserSuccess(user));
+    dispatch({ type: GET_USER_SUCCESS, payload: response.data });
   } catch (error) {
-    console.error("Lỗi khi gọi getUser:", error.response || error.message);
     const message =
-      error.response?.data?.message || "Không thể lấy thông tin người dùng.";
-    dispatch(getUserFailure(message));
+      error.response?.data?.message || "Cannot fetch user profile";
+    dispatch({ type: GET_USER_FAILURE, payload: message });
   }
 };
 
+// ----- Update User Profile -----
+export const updateUser = (userData) => async (dispatch) => {
+  dispatch({ type: UPDATE_USER_REQUEST });
+  try {
+    const jwt = localStorage.getItem("jwt");
+    const response = await axios.put(
+      `${API_BASE_URL}/api/users/profile`,
+      userData,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
 
+    dispatch({ type: UPDATE_USER_SUCCESS, payload: response.data });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Cannot update user profile";
+    dispatch({ type: UPDATE_USER_FAILURE, payload: message });
+    throw new Error(message);
+  }
+};
+
+// ----- Change Password -----
+export const changePassword = (passwordData) => async (dispatch) => {
+  dispatch({ type: CHANGE_PASSWORD_REQUEST });
+  try {
+    const jwt = localStorage.getItem("jwt");
+    const response = await axios.put(
+      `${API_BASE_URL}/api/users/change-password`,
+      passwordData,
+      {
+        headers: { Authorization: `Bearer ${jwt}` },
+      }
+    );
+
+    dispatch({ type: CHANGE_PASSWORD_SUCCESS, payload: response.data });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || "Cannot change password";
+    dispatch({ type: CHANGE_PASSWORD_FAILURE, payload: message });
+    throw new Error(message);
+  }
+};
+
+// ----- Logout -----
 export const logout = () => (dispatch) => {
-  dispatch({ type: LOGOUT, payload: null });
+  localStorage.removeItem("jwt");
+  dispatch({ type: LOGOUT });
 };

@@ -14,17 +14,14 @@ const style = {
 };
 
 export default function AuthModal({ handleClose, open, initialMode = "register" }) {
-  const [mode, setMode] = useState(initialMode); // "register" | "login"
+  const [mode, setMode] = useState(initialMode);
 
-  const toggleMode = () => setMode(mode === "login" ? "register" : "login");
+  const handleLoginSuccess = () => {
+    handleClose(); // close modal after login
+  };
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    <Modal open={open} onClose={handleClose}>
       <Box
         sx={{
           ...style,
@@ -36,17 +33,9 @@ export default function AuthModal({ handleClose, open, initialMode = "register" 
           padding: "40px",
         }}
       >
-        {mode === "login" && (
-          <LoginForm onSwitchMode={setMode} />
-        )}
-
-        {mode === "register" && (
-          <Register onSwitchMode={setMode} />
-        )}
-
-        {mode === "forgot" && (
-          <ForgotPasswordForm onSwitchMode={setMode} />
-        )}
+        {mode === "login" && <LoginForm onSwitchMode={setMode} onLoginSuccess={handleLoginSuccess} />}
+        {mode === "register" && <Register onSwitchMode={setMode} />}
+        {mode === "forgot" && <ForgotPasswordForm onSwitchMode={setMode} />}
       </Box>
     </Modal>
   );

@@ -15,6 +15,7 @@ import AboutUs from "../customer/components/AboutUs/AboutUs";
 import SearchResults from "../customer/components/Product/SearchResults";
 import AdminContent from "../admin/AdminContent";
 import ResetPasswordPage from "../customer/Auth/ResetPasswordPage";
+import Profile from "../customer/components/Profile/Profile";
 
 const CustomerRouter = () => {
   const [show, setShow] = useState(true);
@@ -107,6 +108,7 @@ const CustomerRouter = () => {
           path="/account/order/:orderId"
           element={<OrderDetails />}
         ></Route>
+        <Route path="/account/profile" element={<Profile />}></Route>
       </Routes>
       <div>
         <Footer />

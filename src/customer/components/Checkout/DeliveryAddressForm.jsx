@@ -1,8 +1,44 @@
 import { Grid, Button, TextField, Box } from "@mui/material";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import AddressCard from "../AddressCard/AddressCard";
 
 const DeliveryAddressForm = ({ onSubmitAddress }) => {
+  const { user } = useSelector((store) => store.auth);
+
+  // State for live preview of address
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    phoneNumber: "",
+  });
+
+  // Populate first and last name from user profile
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phoneNumber: user.mobile || "",
+        address: user.addresses?.[0]?.streetAddress || "",
+        city: user.addresses?.[0]?.city || "",
+        zip: user.addresses?.[0]?.zipCode || "",
+      }));
+    }
+  }, [user]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,9 +50,9 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
       zipCode: data.get("zip"),
     };
 
-    console.log("address gửi API:", address);
+    console.log("address sent to API:", address);
 
-    // Gửi dữ liệu ra Checkout.jsx để gọi API
+    // Send data to Checkout.jsx to call API
     if (onSubmitAddress) {
       onSubmitAddress(address);
     }
@@ -26,19 +62,13 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
     <div>
       <Grid container spacing={4}>
         <Grid
+          item
           xs={12}
           lg={5}
           className="border rounded-e-md shadow-md h-[30.5rem] overflow-y-scroll"
         >
-          <div className="p-5 py-7 border-b cursor-pointer">
-            <AddressCard />
-            <Button
-              sx={{ mt: 2, bgcolor: "#9553fe" }}
-              size="large"
-              variant="contained"
-            >
-              Deliver Here
-            </Button>
+          <div className="p-5 py-7 border-b">
+            <AddressCard address={formData} />
           </div>
         </Grid>
 
@@ -54,6 +84,12 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                     label="First Name"
                     fullWidth
                     autoComplete="given-name"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    disabled
                   />
                 </Grid>
 
@@ -64,7 +100,13 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                     name="lastName"
                     label="Last Name"
                     fullWidth
-                    autoComplete="given-name"
+                    autoComplete="family-name"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    disabled
                   />
                 </Grid>
 
@@ -77,7 +119,9 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                     fullWidth
                     multiline
                     rows={4}
-                    autoComplete="given-name"
+                    autoComplete="street-address"
+                    value={formData.address}
+                    onChange={handleInputChange}
                   />
                 </Grid>
 
@@ -88,18 +132,9 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                     name="city"
                     label="City"
                     fullWidth
-                    autoComplete="given-name"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    required
-                    id="state"
-                    name="state"
-                    label="State/Province/Region"
-                    fullWidth
-                    autoComplete="given-name"
+                    autoComplete="address-level2"
+                    value={formData.city}
+                    onChange={handleInputChange}
                   />
                 </Grid>
 
@@ -110,29 +145,38 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                     name="zip"
                     label="Zip"
                     fullWidth
-                    autoComplete="shipping postal-code"
+                    autoComplete="postal-code"
+                    value={formData.zip}
+                    onChange={handleInputChange}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <TextField
                     required
                     id="phoneNumber"
                     name="phoneNumber"
                     label="Phone Number"
                     fullWidth
-                    autoComplete="given-name"
+                    autoComplete="tel"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    disabled
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <Button
-                    sx={{ py: 2, mt: 2, bgcolor: "#9553fe" }}
+                    sx={{ py: 1.5, mt: 2, bgcolor: "#9553fe" }}
                     size="large"
                     variant="contained"
                     type="submit"
+                    fullWidth
                   >
-                    Delivery
+                    Deliver to This Address
                   </Button>
                 </Grid>
               </Grid>

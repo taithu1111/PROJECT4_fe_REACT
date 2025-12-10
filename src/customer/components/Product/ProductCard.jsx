@@ -1,31 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./ProductCard.css";
 import { useNavigate } from "react-router-dom";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { Rating } from "@mui/material"; // Chỉ import Rating từ @mui/material
-import axios from "axios";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { getAuthHeaders } from "../../../api/GetAuthHeaders";
 import { formatCurrency } from "../../../comon/formatCurrency";
-import { API_BASE_URL } from "../../../api/APIProduct";
 import placeholderImage from "../../../assets/images/placeholder.png";
+import StarRating from "./StarRating";
 
 const ProductCard = ({ product, handleClick }) => {
   const navigate = useNavigate();
-  const [averageRating, setAverageRating] = useState(0);
   const [imageError, setImageError] = useState(false);
 
-  useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/api/ratings/average-rating/${product.id}`, {
-        headers: getAuthHeaders(),
-      })
-      .then((res) => {
-        // console.log(res.data);
-        setAverageRating(res.data);
-      })
-      .catch((err) => console.log(err));
-  }, [product.id]);
+  // Get first image from images array or use placeholder
+  const productImage = !imageError && product.images && product.images.length > 0
+    ? product.images[0]
+    : placeholderImage;
 
   return (
     <div className="group relative cursor-pointer transition-all w-full">
@@ -35,11 +23,7 @@ const ProductCard = ({ product, handleClick }) => {
       >
         <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center">
           <img
-            src={
-              imageError || !product.images || !product.images[0]
-                ? placeholderImage
-                : product.images[0]
-            }
+            src={productImage}
             alt={product.productName || "Product image"}
             className="object-cover border border-gray-200 rounded-lg w-full h-full"
             onError={() => setImageError(true)}
@@ -63,16 +47,17 @@ const ProductCard = ({ product, handleClick }) => {
             {product.productName}
           </a>
         </h2>
-        <div className="flex items-center mb-1">
-          <Rating
-            name="read-only"
-            value={averageRating}
-            precision={0.5}
-            readOnly
+
+        {/* Star Rating - using rating from ProductDTO */}
+        <div className="mb-1">
+          <StarRating
+            rating={product.rating || 0}
+            reviewCount={product.reviews?.length}
             size="small"
-            sx={{ fontSize: "14px" }}
+            showNumber={false}
           />
         </div>
+
         <p className="text-base font-semibold font-san text-gray-900">
           {formatCurrency(product.price, "$")}
         </p>

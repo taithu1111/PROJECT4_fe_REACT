@@ -1,54 +1,202 @@
 import React from "react";
-import Grid from "@mui/material/Grid";
-import AdjustIcon from "@mui/icons-material/Adjust";
+import { formatCurrency } from "../../../comon/formatCurrency";
+import { Grid, Box, Typography, Chip, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import { useDispatch } from "react-redux";
+import { deleteOrder } from "../../../State/Order/Action";
 
-const OrderCard = () => {
+const OrderCard = ({ order }) => {
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+
+  const canDelete =
+    order.orderStatus === "PENDING" ||
+    order.orderStatus === "CANCELLED";
+
+  const handleDelete = () => {
+    if (!window.confirm("Delete this order?")) return;
+    dispatch(deleteOrder(order.id));
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+
+
+  // ... (existing imports)
+
+  // Use formatCurrency utility
+  const formatPrice = (price) => {
+    return formatCurrency(price);
+  };
+
+  // Get status color and icon
+  const getStatusConfig = (status) => {
+    const statusLower = status?.toLowerCase() || "";
+
+    if (statusLower.includes("delivered")) {
+      return {
+        color: "#4caf50",
+        bgColor: "#e8f5e9",
+        icon: <CheckCircleOutlineIcon fontSize="small" />,
+        label: "Delivered",
+      };
+    }
+    if (statusLower.includes("shipped") || statusLower.includes("on_the_way") || statusLower.includes("on the way")) {
+      return {
+        color: "#9c27b0",
+        bgColor: "#f3e5f5",
+        icon: <LocalShippingOutlinedIcon fontSize="small" />,
+        label: "Shipped",
+      };
+    }
+    if (statusLower.includes("returned")) {
+      return {
+        color: "#ff5722",
+        bgColor: "#fbe9e7",
+        icon: <KeyboardReturnIcon fontSize="small" />,
+        label: "Returned",
+      };
+    }
+    if (statusLower.includes("cancelled") || statusLower.includes("canceled")) {
+      return {
+        color: "#f44336",
+        bgColor: "#ffebee",
+        icon: <CancelOutlinedIcon fontSize="small" />,
+        label: "Cancelled",
+      };
+    }
+    if (statusLower.includes("processing") || statusLower.includes("placed")) {
+      return {
+        color: "#2196f3",
+        bgColor: "#e3f2fd",
+        icon: <HourglassEmptyIcon fontSize="small" />,
+        label: "Placed",
+      };
+    }
+    if (statusLower.includes("confirmed")) {
+      return {
+        color: "#4caf50",
+        bgColor: "#e8f5e9",
+        icon: <CheckCircleOutlineIcon fontSize="small" />,
+        label: "Confirmed",
+      };
+    }
+    // Default: Pending
+    return {
+      color: "#ff9800",
+      bgColor: "#fff3e0",
+      icon: <HourglassEmptyIcon fontSize="small" />,
+      label: "Pending",
+    };
+  };
+
+  const statusConfig = getStatusConfig(order.orderStatus);
+
   return (
-    <div onClick={() => navigate(`/account/order/${5}`)} className="p-5 shadow-md shadow-black hover:shadow-2xl border">
-      <Grid container spacing={2} sx={{ justifyContent: "space-between" }}>
-        <Grid item xs={6}>
-          <div className="flex cursor-pointer">
-            <img
-              className="w-[5rem] h-[5rem] object-cover object-top"
-              src="https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/27fd4c90-314f-4609-8f36-d7fca3b488f1/jordan-dri-fit-sport-golf-polo-pclvPv.png"
-              alt=""
-            />
-            <div className="ml-5 space-y-2">
-              <p className="">Men Shirt</p>
-              <p className="opacity-50 text-xs font-semibold">Size: L</p>
-              <p className="opacity-50 text-xs font-semibold">Color: Oriz</p>
-            </div>
-          </div>
-        </Grid>
+    <Box
+      className="order-card"
+      onClick={() => navigate(`/account/order/${order.id}`)}
+    >
+      {/* Order Header */}
+      <Box className="order-card-header">
+        <Box>
+          <Typography variant="body2" color="text.secondary">
+            Order ID: <strong>{order.orderId}</strong>
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Placed on {formatDate(order.orderDate)}
+          </Typography>
+        </Box>
+        <Chip
+          icon={statusConfig.icon}
+          label={statusConfig.label}
+          size="small"
+          sx={{
+            backgroundColor: statusConfig.bgColor,
+            color: statusConfig.color,
+            fontWeight: 600,
+          }}
+        />
+      </Box>
 
-        <Grid item xs={2}>
-          <p>💵 299</p>
-        </Grid>
-
-        <Grid item xs={4}>
-          {true && (
-            <div>
-              <p>
-                <AdjustIcon
-                  sx={{ width: "15px", height: "15px" }}
-                  className="text-green-600 mr-2 text-sm"
+      {/* Order Items */}
+      <Box className="order-items">
+        {order.orderItems && order.orderItems.length > 0 ? (
+          order.orderItems.slice(0, 2).map((item, index) => (
+            <Grid container spacing={2} key={index} className="order-item">
+              <Grid item xs={3}>
+                <img
+                  src={item.product?.imageUrl || item.imageUrl || "/placeholder-image.png"}
+                  alt={item.product?.title || item.productName || "Product"}
+                  className="order-item-image"
                 />
-                <span>Delivered On March</span>
-              </p>
-              <p className="text-xs">Ur item has been delivered</p>
-            </div>
-          )}
-          {false && (
-            <p>
-              <span>Expected</span>
-            </p>
-          )}
-        </Grid>
-      </Grid>
-    </div>
+              </Grid>
+              <Grid item xs={9}>
+                <Typography variant="body2" className="order-item-name">
+                  {item.product?.title || item.productName || "Product"}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Quantity: {item.quantity}
+                </Typography>
+                <Typography variant="body2" color="primary" fontWeight={600}>
+                  {formatPrice(item.price)}
+                </Typography>
+              </Grid>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No items
+          </Typography>
+        )}
+
+        {order.orderItems && order.orderItems.length > 2 && (
+          <Typography variant="caption" color="text.secondary">
+            +{order.orderItems.length - 2} more item(s)
+          </Typography>
+        )}
+      </Box>
+
+      {/* Order Footer */}
+      <Box className="order-card-footer">
+        <Box>
+          <Typography variant="caption" color="text.secondary">
+            Total Amount
+          </Typography>
+          <Typography variant="h6" color="primary">
+            {formatPrice(order.totalPrice)}
+          </Typography>
+        </Box>
+        <Button variant="outlined" size="small">
+          View Details
+        </Button>
+        {canDelete && (
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleDelete}
+            sx={{ mt: 2 }}
+          >
+            Delete Order
+          </Button>
+        )}
+      </Box>
+    </Box>
   );
 };
 
