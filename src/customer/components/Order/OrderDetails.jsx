@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { formatCurrency } from "../../../comon/formatCurrency";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
@@ -107,7 +108,7 @@ const OrderDetails = () => {
                     <span>Size: {item.size}</span>
                   </p>
                   <p>Seller: {item.product?.brand || item.brand}</p>
-                  <p>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}</p>
+                  <p>{formatCurrency(item.price)}</p>
                 </div>
               </div>
             </Grid>

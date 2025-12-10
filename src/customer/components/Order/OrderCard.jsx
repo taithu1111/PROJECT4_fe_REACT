@@ -1,4 +1,5 @@
 import React from "react";
+import { formatCurrency } from "../../../comon/formatCurrency";
 import { Grid, Box, Typography, Chip, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
@@ -33,12 +34,13 @@ const OrderCard = ({ order }) => {
     });
   };
 
-  // Format price in VND
+
+
+  // ... (existing imports)
+
+  // Use formatCurrency utility
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
+    return formatCurrency(price);
   };
 
   // Get status color and icon

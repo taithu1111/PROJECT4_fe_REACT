@@ -152,7 +152,21 @@ const Profile = () => {
         if (!validateForm()) return;
 
         try {
-            await dispatch(updateUser(formData));
+            const payload = {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                mobile: formData.mobile,
+                addresses: [
+                    {
+                        streetAddress: formData.address.streetAddress,
+                        city: formData.address.city,
+                        zipCode: formData.address.zipCode,
+                    },
+                ],
+            };
+
+            await dispatch(updateUser(payload));
             setSuccessMessage("Profile updated successfully!");
             setEditMode(false);
             setTimeout(() => setSuccessMessage(""), 3000);

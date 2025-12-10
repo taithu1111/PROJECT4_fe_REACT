@@ -141,19 +141,6 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
-                    id="state"
-                    name="state"
-                    label="State/Province/Region"
-                    fullWidth
-                    autoComplete="address-level1"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    required
                     id="zip"
                     name="zip"
                     label="Zip"
@@ -164,7 +151,7 @@ const DeliveryAddressForm = ({ onSubmitAddress }) => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <TextField
                     required
                     id="phoneNumber"

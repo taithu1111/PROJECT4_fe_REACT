@@ -13,6 +13,7 @@ import { getAuthHeaders } from "../../../api/GetAuthHeaders";
 import { API_BASE_URL } from "../../../api/APIProduct";
 import StarRating from "../Product/StarRating";
 import placeholderImage from "../../../assets/images/placeholder.png";
+import { formatCurrency } from "../../../comon/formatCurrency";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -173,7 +174,7 @@ export default function ProductDetails() {
 
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <div className="flex space-x-5 items-center text-lg lg:text-xl text-gray-900 mt-6">
-                <p className="font-semibold text-3xl text-green-600">${dataProduct.price}</p>
+                <p className="font-semibold text-3xl text-green-600">{formatCurrency(dataProduct.price)}</p>
                 <p className="font-san text-[15px]">
                   Availability:
                   <span className="font-san text-[15px] text-[#797979]">

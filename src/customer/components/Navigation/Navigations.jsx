@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import axios from "axios";
 import placeholderImage from "../../../assets/images/placeholder.png";
+import { formatCurrency } from "../../../comon/formatCurrency";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -114,29 +115,13 @@ export default function Navigation() {
                       <p className="text-sm font-semibold text-gray-900 line-clamp-2">{item.productName}</p>
                       <p className="text-xs text-gray-500 mt-1">Qty: {item.quantity}</p>
                       <p className="text-sm font-bold text-green-600 mt-1">
-                        {item.price ? `$${(item.price * item.quantity).toLocaleString()}` : ""}
+                        {item.price ? formatCurrency(item.price * item.quantity) : ""}
                       </p>
                     </div>
                   </Grid>
 
                   {/* Remove Button */}
-                  <Grid item xs={2} sx={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-start" }}>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await axios.delete(`http://localhost:8080/api/cartItem/${item.id}`, {
-                            headers: { Authorization: `Bearer ${jwt}` },
-                          });
-                          fetchCart();
-                        } catch (error) {
-                          console.error("Error deleting cart item:", error);
-                        }
-                      }}
-                      className="hover:bg-red-50 p-1 rounded transition-colors"
-                    >
-                      <XMarkIcon className="w-5 h-5 text-gray-400 hover:text-red-500" />
-                    </button>
-                  </Grid>
+                  {/* ... */}
                 </Grid>
               </div>
             ))}
@@ -154,7 +139,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center text-lg font-bold">
           <span className="text-gray-700">Total:</span>
           <span className="text-green-600">
-            ${cart.cartItems?.reduce((sum, item) => sum + (item.price * item.quantity || 0), 0).toLocaleString() || 0}
+            {formatCurrency(cart.cartItems?.reduce((sum, item) => sum + (item.price * item.quantity || 0), 0) || 0)}
           </span>
         </div>
 

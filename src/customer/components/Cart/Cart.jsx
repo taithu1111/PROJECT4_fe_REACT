@@ -62,7 +62,7 @@ const Cart = ({ cart, setCart }) => {
     );
   }
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
+  const totalPrice = cartData?.totalPrice || 0;
 
   return (
     <div className="bg-gray-50 min-h-screen py-8">
