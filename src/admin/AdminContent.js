@@ -6,6 +6,7 @@ import CategoryManagement from './category/CategoryManagement';
 import OrderManagement from './order/OrderManagement';
 import RatingManagement from './rating/RatingManagement';
 import ReviewManagement from './review/ReviewManagement';
+import PaymentManagement from './payment/PaymentManagement';
 import './styles/adminContent.css';
 import {
     LayoutDashboard,
@@ -18,6 +19,7 @@ import {
     Image,
     Menu,
     X,
+    CreditCard,
     Plus,
     Edit,
     Trash2,
@@ -30,6 +32,14 @@ import {
 const AdminContent = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [openCreateProduct, setOpenCreateProduct] = useState(false);
+    const [openCreateCategory, setOpenCreateCategory] = useState(false);
+    const handleResetCreateFlag = () => {
+        setOpenCreateCategory(false);
+    };
+    const handleResetProductFlag = () => {
+        setOpenCreateProduct(false);
+    };
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -37,6 +47,7 @@ const AdminContent = () => {
         { id: 'products', label: 'Quản lý sản phẩm', icon: Package },
         { id: 'categories', label: 'Quản lý danh mục', icon: FolderTree },
         { id: 'orders', label: 'Quản lý đơn hàng', icon: ShoppingCart },
+        { id: 'payment', label: 'Thanh toán', icon: CreditCard },
         { id: 'ratings', label: 'Quản lý đánh giá', icon: Star },
         { id: 'reviews', label: 'Quản lý bình luận', icon: MessageSquare },
     ];
@@ -79,12 +90,25 @@ const AdminContent = () => {
                 {/* Main Content */}
                 <div className="flex-1 overflow-auto">
                     <div className="p-6">
-                        {activeTab === 'dashboard' && <Dashboard />}
+                        {activeTab === 'dashboard' && (
+                            <Dashboard
+                                onAddProduct={() => {
+                                    setActiveTab('products');
+                                    setOpenCreateProduct(true);
+                                }}
+                                onShowOrders={() => setActiveTab('orders')}
+                                onAddCategory={() => {
+                                    setActiveTab('categories');
+                                    setOpenCreateCategory(true);
+                                }}
+                            />
+                        )}
                         {activeTab === 'users' && <UserManagement />}
-                        {activeTab === 'products' && <ProductManagement />}
-                        {activeTab === 'categories' && <CategoryManagement />}
+                        {activeTab === 'products' && <ProductManagement openCreateProduct={openCreateProduct} onResetCreateFlag={handleResetProductFlag} />}
+                        {activeTab === 'categories' && <CategoryManagement openCreateCategory={openCreateCategory} onResetCreateFlag={handleResetCreateFlag} />}
                         {activeTab === 'orders' && <OrderManagement />}
                         {activeTab === 'ratings' && <RatingManagement />}
+                        {activeTab === 'payment' && <PaymentManagement />}
                         {activeTab === 'reviews' && <ReviewManagement />}
                     </div>
                 </div>

@@ -1,21 +1,30 @@
 // src/admin/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import { Users, Package, ShoppingCart, Star, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, Package, ShoppingCart, Star, TrendingUp, AlertCircle, FolderTree, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import AdminStatisticsService from './api/AdminStatisticsService';
+import AdminOrderService from './api/AdminOrderService';
 
-const Dashboard = () => {
+const Dashboard = ({ onAddProduct, onShowOrders, onAddCategory }) => {
     const [stats, setStats] = useState({
         totalUsers: 0,
         totalProducts: 0,
         totalOrders: 0,
         totalRatings: 0
     });
+    const [paidOrders, setPaidOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [ordersLoading, setOrdersLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Pagination for paid orders
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize] = useState(5);
 
     useEffect(() => {
         fetchDashboardStats();
-    }, []);
+        fetchPaidOrders();
+    }, [currentPage]);
 
     const fetchDashboardStats = async () => {
         try {
@@ -31,12 +40,39 @@ const Dashboard = () => {
         }
     };
 
+    const fetchPaidOrders = async () => {
+        try {
+            setOrdersLoading(true);
+            const data = await AdminOrderService.getPaidOrders(currentPage, pageSize, 'deliveryDate');
+            setPaidOrders(data.content || []);
+            setTotalPages(data.totalPages || 0);
+        } catch (err) {
+            console.error('Error fetching paid orders:', err);
+        } finally {
+            setOrdersLoading(false);
+        }
+    };
+
     const statsCards = [
-        { label: 'Tổng người dùng', value: stats.totalUsers || '0', icon: Users, color: 'bg-blue-100 text-blue-600', trend: '+0%' },
-        { label: 'Tổng sản phẩm', value: stats.totalProducts || '0', icon: Package, color: 'bg-green-100 text-green-600', trend: '+0%' },
-        { label: 'Tổng đơn hàng', value: stats.totalOrders || '0', icon: ShoppingCart, color: 'bg-purple-100 text-purple-600', trend: '+0%' },
-        { label: 'Tổng đánh giá', value: stats.totalRatings || '0', icon: Star, color: 'bg-yellow-100 text-yellow-600', trend: '+0%' },
+        { label: 'Tổng người dùng', value: stats.totalUsers || '0', icon: Users, color: 'bg-blue-100 text-blue-600' },
+        { label: 'Tổng sản phẩm', value: stats.totalProducts || '0', icon: Package, color: 'bg-green-100 text-green-600' },
+        { label: 'Tổng đơn hàng', value: stats.totalOrders || '0', icon: ShoppingCart, color: 'bg-purple-100 text-purple-600' },
+        { label: 'Tổng đánh giá', value: stats.totalRatings || '0', icon: Star, color: 'bg-yellow-100 text-yellow-600' },
     ];
+
+    const getStatusBadge = (status) => {
+        const statusConfig = {
+            'PAID': { label: 'Đã thanh toán', color: 'bg-green-100 text-green-800' },
+            'DELIVERED': { label: 'Đã giao', color: 'bg-blue-100 text-blue-800' },
+            'SHIPPED': { label: 'Đang giao', color: 'bg-purple-100 text-purple-800' },
+        };
+        const config = statusConfig[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                {config.label}
+            </span>
+        );
+    };
 
     if (loading) {
         return (
@@ -73,10 +109,12 @@ const Dashboard = () => {
                                 <div className={`p-3 rounded-lg ${stat.color}`}>
                                     <Icon size={24} />
                                 </div>
-                                <span className="text-xs font-medium text-gray-500 flex items-center gap-1">
-                                    <TrendingUp size={14} />
-                                    {stat.trend}
-                                </span>
+                                {stat.trend && (
+                                    <span className="text-xs font-medium text-gray-500 flex items-center gap-1">
+                                        <TrendingUp size={14} />
+                                        {stat.trend}
+                                    </span>
+                                )}
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
@@ -104,17 +142,17 @@ const Dashboard = () => {
             <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
                 <h3 className="text-lg font-semibold text-[#2d2d2d] mb-4">Thao tác nhanh</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <button onClick={onAddCategory} className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                         <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                            <Users size={20} />
+                            <FolderTree size={20} />
                         </div>
                         <div className="text-left">
-                            <p className="font-medium text-gray-900">Thêm người dùng</p>
-                            <p className="text-xs text-gray-500">Tạo tài khoản mới</p>
+                            <p className="font-medium text-gray-900">Thêm danh mục</p>
+                            <p className="text-xs text-gray-500">Tạo danh mục mới</p>
                         </div>
                     </button>
 
-                    <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <button onClick={onAddProduct} className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                         <div className="p-2 bg-green-100 text-green-600 rounded-lg">
                             <Package size={20} />
                         </div>
@@ -124,7 +162,7 @@ const Dashboard = () => {
                         </div>
                     </button>
 
-                    <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <button onClick={onShowOrders} className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                         <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
                             <ShoppingCart size={20} />
                         </div>
@@ -136,11 +174,107 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Recent Activities */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-[#2d2d2d] mb-4">Hoạt động gần đây</h3>
-                <div className="text-center py-8 text-gray-500">
-                    <p className="text-sm">Chưa có hoạt động nào</p>
+            {/* Paid Orders List */}
+            <div className="bg-white rounded-lg border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h3 className="text-lg font-semibold text-[#2d2d2d]">Đơn hàng đã thanh toán</h3>
+                            <p className="text-sm text-gray-500 mt-1">Danh sách các đơn hàng đã hoàn thành thanh toán</p>
+                        </div>
+                        {paidOrders.length > 0 && (
+                            <div className="text-sm text-gray-600">
+                                Tổng: <span className="font-semibold">{paidOrders.length}</span> đơn hàng
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="p-6">
+                    {ordersLoading ? (
+                        <div className="text-center py-8 text-gray-500">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                            <p className="text-sm mt-2">Đang tải...</p>
+                        </div>
+                    ) : paidOrders.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                            <ShoppingCart size={48} className="mx-auto mb-2 text-gray-300" />
+                            <p className="text-sm">Chưa có đơn hàng nào được thanh toán</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã đơn</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Khách hàng</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày đặt</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ngày giao</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng tiền</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {paidOrders.map(order => (
+                                            <tr key={order.id} className="hover:bg-gray-50">
+                                                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                                                    {order.orderId}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-900">
+                                                    <div>
+                                                        <p className="font-medium">{order.userEmail || `User #${order.userId}`}</p>
+                                                        {order.shippingAddress && (
+                                                            <p className="text-xs text-gray-500">{order.shippingAddress.city}</p>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-600">
+                                                    {order.orderDate ? new Date(order.orderDate).toLocaleDateString('vi-VN') : '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-600">
+                                                    {order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString('vi-VN') : '-'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <span className="font-semibold text-green-600">
+                                                        ${order.totalPrice?.toFixed(2) || '0.00'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    {getStatusBadge(order.orderStatus)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                        disabled={currentPage === 0}
+                                        className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <ChevronLeft size={16} />
+                                        Trước
+                                    </button>
+                                    <span className="text-sm text-gray-600">
+                                        Trang {currentPage + 1} / {totalPages}
+                                    </span>
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                        disabled={currentPage >= totalPages - 1}
+                                        className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Sau
+                                        <ChevronRight size={16} />
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import { Plus, Edit, Trash2, RefreshCw, FolderTree } from 'lucide-react';
 import CategoryModal from './CategoryModal';
 import AdminCategoryService from '../api/AdminCategoryService';
 
-const CategoryManagement = () => {
+const CategoryManagement = ({ openCreateCategory, onResetCreateFlag }) => {
     const [categories, setCategories] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
@@ -14,7 +14,13 @@ const CategoryManagement = () => {
     useEffect(() => {
         fetchCategories();
     }, []);
-
+    useEffect(() => {
+        if (openCreateCategory) {
+            setEditingCategory(null);
+            setShowModal(true);
+            onResetCreateFlag();   // Rese
+        };
+    }, [openCreateCategory]);
     const fetchCategories = async () => {
         try {
             setLoading(true);

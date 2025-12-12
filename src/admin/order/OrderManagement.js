@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit, Search, ShoppingCart, RefreshCw, Trash2, ArrowRight, CheckCircle, Truck } from 'lucide-react';
 import OrderDetailModal from './OrderDetailModal';
 import AdminOrderService from '../api/AdminOrderService';
+import { formatCurrency } from '../../comon/formatCurrency';
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,7 +24,8 @@ const OrderManagement = () => {
         { value: 'CONFIRMED', label: 'Đã xác nhận', color: 'bg-blue-100 text-blue-800' },
         { value: 'SHIPPED', label: 'Đang giao', color: 'bg-purple-100 text-purple-800' },
         { value: 'DELIVERED', label: 'Đã giao', color: 'bg-green-100 text-green-800' },
-        { value: 'CANCELLED', label: 'Đã hủy', color: 'bg-red-100 text-red-800' }
+        { value: 'CANCELLED', label: 'Đã hủy', color: 'bg-red-100 text-red-800' },
+        { value: 'PAID', label: 'Đã thanh toán', color: 'bg-teal-100 text-teal-800' }
     ];
 
     // Bản đồ trạng thái tiếp theo hợp lệ
@@ -188,7 +190,7 @@ const OrderManagement = () => {
                                             <td className="px-6 py-4 text-sm text-gray-900">
                                                 {order.user?.email || `User #${order.userId}`}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">${order.totalPrice}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(order.totalPrice, "$")}</td>
                                             <td className="px-6 py-4 text-sm">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${status?.color}`}>
                                                     {status?.label}

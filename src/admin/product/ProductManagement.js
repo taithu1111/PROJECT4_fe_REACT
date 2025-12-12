@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductModal from './ProductModal';
 import AdminProductService from '../api/AdminProductService';
+import { formatCurrency } from '../../comon/formatCurrency';
 
-const ProductManagement = () => {
+const ProductManagement = ({ openCreateProduct, onResetCreateFlag }) => {
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -19,6 +20,14 @@ const ProductManagement = () => {
     useEffect(() => {
         fetchProducts();
     }, []);
+    useEffect(() => {
+        if (openCreateProduct) {
+            setEditingProduct(null);
+            setShowModal(true);
+            onResetCreateFlag(); // reset để tránh modal tự mở khi đổi tab
+        }
+    }, [openCreateProduct]);
+
 
     const fetchProducts = async () => {
         try {
@@ -200,7 +209,7 @@ const ProductManagement = () => {
                                     <td className="px-6 py-4 text-sm text-gray-900">{product.id}</td>
                                     <td className="px-6 py-4 text-sm text-gray-900">{product.productName}</td>
                                     <td className="px-6 py-4 text-sm text-gray-900">{product.brand}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">${product.price}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(product.price, "$")}</td>
                                     <td className="px-6 py-4 text-sm">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.quantity > 20 ? 'bg-green-100 text-green-800' :
                                             product.quantity > 0 ? 'bg-yellow-100 text-yellow-800' :
