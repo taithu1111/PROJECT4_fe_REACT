@@ -84,6 +84,7 @@ export const login = (userData) => async (dispatch) => {
 
     if (user.token) {
       localStorage.setItem("jwt", user.token);
+      localStorage.setItem("message", user.message);
     }
 
     dispatch({

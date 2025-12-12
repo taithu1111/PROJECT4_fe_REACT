@@ -13,7 +13,7 @@ const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-
+  const [user, setUser] = useState(null);
   const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
   const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
@@ -34,8 +34,12 @@ const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
 
     try {
       const token = await dispatch(login(formData));
+      const message = localStorage.getItem("message");
+      console.log("Login message:", message);
+
       if (token) {
         await dispatch(getUser(token));
+        console.log("Logged in user:", user);
         toast.success("Login successful! Welcome back.", {
           position: "top-right",
           autoClose: 3000,
@@ -46,7 +50,11 @@ const LoginForm = ({ onSwitchMode, onLoginSuccess }) => {
           theme: "light",
         });
         onLoginSuccess(); // close modal
-        navigate("/"); // redirect home
+        if (message === "Admin") {
+          navigate("/admin");
+        } else {
+          navigate("/"); // user bình thường
+        }
       }
     } catch (err) {
       toast.error(err.message || "Login failed. Please try again.", {
