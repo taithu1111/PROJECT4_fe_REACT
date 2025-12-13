@@ -1,6 +1,6 @@
 // src/admin/order/OrderManagement.js
 import React, { useState, useEffect } from 'react';
-import { Edit, Search, ShoppingCart, RefreshCw, Trash2, ArrowRight, CheckCircle, Truck } from 'lucide-react';
+import { Edit, Search, ShoppingCart, RefreshCw, Trash2, ArrowRight, CheckCircle, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
 import OrderDetailModal from './OrderDetailModal';
 import AdminOrderService from '../api/AdminOrderService';
 import { formatCurrency } from '../../comon/formatCurrency';
@@ -16,6 +16,11 @@ const OrderManagement = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize] = useState(10);
+
+    const [pageInput, setPageInput] = useState("");
+
+    const pageCount = totalPages; // Rename for clarity if needed, but totalPages is already state.
+    // NOTE: currentPage is 0-indexed in API, but we display 1-indexed to user.
 
     const statusOptions = [
         { value: 'all', label: 'Tất cả' },
@@ -97,6 +102,43 @@ const OrderManagement = () => {
         } catch (err) {
             console.error('Error deleting order:', err);
             alert('Không thể xóa đơn hàng');
+        }
+    };
+
+
+
+    const handlePageChange = (newPage) => {
+        // newPage is 0-indexed
+        setCurrentPage(newPage);
+        setPageInput("");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handlePageInputChange = (e) => {
+        const value = e.target.value;
+        if (value === "" || /^\d+$/.test(value)) {
+            setPageInput(value);
+        }
+    };
+
+    const handlePageInputSubmit = (e) => {
+        e.preventDefault();
+        if (pageInput === "") return;
+
+        const pageNum = parseInt(pageInput, 10);
+        // pageNum is 1-indexed from user
+        if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+            handlePageChange(pageNum - 1);
+        }
+    };
+
+    const handlePageInputBlur = () => {
+        if (pageInput !== "") {
+            const pageNum = parseInt(pageInput, 10);
+            if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+                handlePageChange(pageNum - 1);
+            }
+            setPageInput("");
         }
     };
 
@@ -244,27 +286,119 @@ const OrderManagement = () => {
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
-                    <div className="p-4 border-t border-gray-200 flex justify-between items-center">
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                            disabled={currentPage === 0}
-                            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-                        >
-                            Trước
-                        </button>
-                        <span className="text-sm text-gray-600">
-                            Trang {currentPage + 1} / {totalPages}
-                        </span>
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-                            disabled={currentPage >= totalPages - 1}
-                            className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50"
-                        >
-                            Sau
-                        </button>
+                <div className="py-4 border-t border-gray-200">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        {(() => {
+                            if (totalPages <= 1) return null;
+
+                            const uiCurrentPage = currentPage + 1; // Convert 0-indexed to 1-indexed for display
+                            const windowSize = 1;
+                            const startPage = Math.max(2, uiCurrentPage - windowSize);
+                            const endPage = Math.min(totalPages - 1, uiCurrentPage + windowSize);
+                            const showStartEllipsis = startPage > 2;
+                            const showEndEllipsis = endPage < totalPages - 1;
+
+                            return (
+                                <>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+                                            disabled={currentPage === 0}
+                                            className={`px-2 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors flex items-center justify-center ${currentPage === 0
+                                                ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                }`}
+                                            aria-label="Previous page"
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </button>
+
+                                        <button
+                                            onClick={() => handlePageChange(0)}
+                                            className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${currentPage === 0
+                                                ? "bg-green-500 text-white border-green-500"
+                                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                }`}
+                                        >
+                                            1
+                                        </button>
+
+                                        {showStartEllipsis && (
+                                            <span className="px-2 text-gray-500">…</span>
+                                        )}
+
+                                        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i)
+                                            .map(page => (
+                                                <button
+                                                    key={page}
+                                                    onClick={() => handlePageChange(page - 1)} // Convert 1-indexed page to 0-indexed
+                                                    className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${uiCurrentPage === page
+                                                        ? "bg-green-500 text-white border-green-500"
+                                                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                        }`}
+                                                >
+                                                    {page}
+                                                </button>
+                                            ))}
+
+                                        {showEndEllipsis && (
+                                            <span className="px-2 text-gray-500">…</span>
+                                        )}
+
+                                        {totalPages > 1 && (
+                                            <button
+                                                onClick={() => handlePageChange(totalPages - 1)}
+                                                className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${currentPage === totalPages - 1
+                                                    ? "bg-green-500 text-white border-green-500"
+                                                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                            >
+                                                {totalPages}
+                                            </button>
+                                        )}
+
+                                        <button
+                                            onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
+                                            disabled={currentPage >= totalPages - 1}
+                                            className={`px-2 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors flex items-center justify-center ${currentPage >= totalPages - 1
+                                                ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                }`}
+                                            aria-label="Next page"
+                                        >
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <span>Page</span>
+                                        <form onSubmit={handlePageInputSubmit} className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
+                                                value={pageInput}
+                                                onChange={handlePageInputChange}
+                                                onBlur={handlePageInputBlur}
+                                                placeholder={uiCurrentPage.toString()}
+                                                className="w-12 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 text-center text-sm"
+                                                aria-label="Go to page"
+                                            />
+                                            <span>of {totalPages}</span>
+                                            <button
+                                                type="submit"
+                                                className="px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                                                aria-label="Go to page"
+                                            >
+                                                Go
+                                            </button>
+                                        </form>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </div>
-                )}
+                </div>
             </div>
 
             {selectedOrder && (
