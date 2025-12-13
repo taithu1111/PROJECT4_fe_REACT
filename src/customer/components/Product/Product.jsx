@@ -31,9 +31,9 @@ export default function Product({ handleClick }) {
   const [productsPerPage, setProductsPerPage] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const [maxPrice, setMaxPrice] = useState(999999999);
   const [minPriceInput, setMinPriceInput] = useState("0");
-  const [maxPriceInput, setMaxPriceInput] = useState("10000");
+  const [maxPriceInput, setMaxPriceInput] = useState("999999999");
   const [selectedSort, setSelectedSort] = useState("newest");
   const [searchQuery, setSearchQuery] = useState("");
   const [gridColumns, setGridColumns] = useState(5);
@@ -95,14 +95,14 @@ export default function Product({ handleClick }) {
     // Filter by search query (product name)
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.productName?.toLowerCase().includes(query)
       );
     }
 
     // Filter category - support multiple categories
     if (selectedCategories.length > 0) {
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         selectedCategories.includes(p.category?.category_name)
       );
     }
@@ -117,7 +117,7 @@ export default function Product({ handleClick }) {
         // Try to find date field (common variations)
         const dateA = a.createdAt || a.created_at || a.dateCreated || a.date_created;
         const dateB = b.createdAt || b.created_at || b.dateCreated || b.date_created;
-        
+
         if (dateA && dateB) {
           // If both have dates, sort by date (newest first)
           return new Date(dateB) - new Date(dateA);
@@ -166,7 +166,7 @@ export default function Product({ handleClick }) {
   const handlePageInputSubmit = (e) => {
     e.preventDefault();
     if (pageInput === "") return;
-    
+
     const pageNum = parseInt(pageInput, 10);
     if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
       setCurrentPage(pageNum);
@@ -383,7 +383,7 @@ export default function Product({ handleClick }) {
                           onChange={handleChange}
                           valueLabelDisplay="auto"
                           aria-label="range-slider"
-                          min={0} step={50} max={10000}
+                          min={0} step={50} max={999999999}
                           sx={{ maxWidth: "250px", width: "250px", color: "#34D399" }}
                         />
                         <div className="flex items-center space-x-2 mt-4">
@@ -481,10 +481,9 @@ export default function Product({ handleClick }) {
                         type="submit"
                         disabled={!searchQuery.trim()}
                         className={`flex-shrink-0 px-3 py-2 border rounded-md shadow-sm text-white text-sm transition whitespace-nowrap
-                          ${
-                            searchQuery.trim()
-                              ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
-                              : "bg-gray-300 opacity-60 cursor-not-allowed"
+                          ${searchQuery.trim()
+                            ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                            : "bg-gray-300 opacity-60 cursor-not-allowed"
                           }`}
                       >
                         Search
@@ -509,41 +508,41 @@ export default function Product({ handleClick }) {
                       let filtered = [...products];
                       if (searchQuery.trim()) {
                         const query = searchQuery.trim().toLowerCase();
-                        filtered = filtered.filter(p => 
+                        filtered = filtered.filter(p =>
                           p.productName?.toLowerCase().includes(query)
                         );
                       }
                       if (selectedCategories.length > 0) {
-                        filtered = filtered.filter(p => 
+                        filtered = filtered.filter(p =>
                           selectedCategories.includes(p.category?.category_name)
                         );
                       }
                       filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
-                      return filtered.length > 0 
+                      return filtered.length > 0
                         ? `Found ${filtered.length} product${filtered.length !== 1 ? 's' : ''}`
                         : 'No products found';
                     })()}
                   </p>
                 </div>
               )}
-              
-              <div 
+
+              <div
                 className="products-grid gap-4"
                 style={{
                   '--grid-cols-lg': gridColumns.toString()
                 }}
               >
-              {displayedProducts.length === 0 ? (
-                <div className="flex items-center justify-center w-max h-full">
-                  <p className="custom-message">No products available.</p>
-                </div>
-              ) : (
-                displayedProducts.map((item, index) => (
-                  <div key={index} className="flex items-start justify-center">
-                    <ProductCard product={item} handleClick={handleClick} />
+                {displayedProducts.length === 0 ? (
+                  <div className="flex items-center justify-center w-max h-full">
+                    <p className="custom-message">No products available.</p>
                   </div>
-                ))
-              )}
+                ) : (
+                  displayedProducts.map((item, index) => (
+                    <div key={index} className="flex items-start justify-center">
+                      <ProductCard product={item} handleClick={handleClick} />
+                    </div>
+                  ))
+                )}
               </div>
               {displayedProducts.length > 0 && (
                 <div className="flex flex-col items-center justify-center mt-6 gap-4">
@@ -561,11 +560,10 @@ export default function Product({ handleClick }) {
                         <button
                           onClick={() => handlePageChange(null, Math.max(1, currentPage - 1))}
                           disabled={currentPage === 1}
-                          className={`px-2 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors flex items-center justify-center ${
-                            currentPage === 1
-                              ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-                              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                          }`}
+                          className={`px-2 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors flex items-center justify-center ${currentPage === 1
+                            ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                            }`}
                           aria-label="Previous page"
                         >
                           <ChevronLeftIcon sx={{ fontSize: "20px" }} />
@@ -574,11 +572,10 @@ export default function Product({ handleClick }) {
                         {/* First Page */}
                         <button
                           onClick={() => handlePageChange(null, 1)}
-                          className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${
-                            currentPage === 1
-                              ? "bg-green-500 text-white border-green-500"
-                              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                          }`}
+                          className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${currentPage === 1
+                            ? "bg-green-500 text-white border-green-500"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                            }`}
                         >
                           1
                         </button>
@@ -594,11 +591,10 @@ export default function Product({ handleClick }) {
                             <button
                               key={page}
                               onClick={() => handlePageChange(null, page)}
-                              className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${
-                                currentPage === page
-                                  ? "bg-green-500 text-white border-green-500"
-                                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                              }`}
+                              className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${currentPage === page
+                                ? "bg-green-500 text-white border-green-500"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                }`}
                             >
                               {page}
                             </button>
@@ -613,11 +609,10 @@ export default function Product({ handleClick }) {
                         {totalPages > 1 && (
                           <button
                             onClick={() => handlePageChange(null, totalPages)}
-                            className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${
-                              currentPage === totalPages
-                                ? "bg-green-500 text-white border-green-500"
-                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                            }`}
+                            className={`px-3 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors ${currentPage === totalPages
+                              ? "bg-green-500 text-white border-green-500"
+                              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                              }`}
                           >
                             {totalPages}
                           </button>
@@ -627,11 +622,10 @@ export default function Product({ handleClick }) {
                         <button
                           onClick={() => handlePageChange(null, Math.min(totalPages, currentPage + 1))}
                           disabled={currentPage === totalPages}
-                          className={`px-2 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors flex items-center justify-center ${
-                            currentPage === totalPages
-                              ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-                              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                          }`}
+                          className={`px-2 py-2 min-w-[40px] border rounded-md text-sm font-medium transition-colors flex items-center justify-center ${currentPage === totalPages
+                            ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                            }`}
                           aria-label="Next page"
                         >
                           <ChevronRightIcon sx={{ fontSize: "20px" }} />
@@ -639,7 +633,7 @@ export default function Product({ handleClick }) {
                       </div>
                     );
                   })()}
-                  
+
                   {/* Quick Page Navigation */}
                   {totalPages > 1 && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -673,7 +667,7 @@ export default function Product({ handleClick }) {
           </div>
         </section>
       </main>
-      
+
       {/* Separator line at bottom */}
       <div className="flex justify-center pb-8">
         <div className="w-32 h-px bg-gray-300"></div>

@@ -1,6 +1,6 @@
 // src/admin/order/OrderDetailModal.js
 import React, { useState } from 'react';
-
+import { formatCurrency } from '../../comon/formatCurrency';
 const OrderDetailModal = ({ order, onClose, statusOptions, onStatusChange }) => {
     const [orderStatus, setOrderStatus] = useState(order.orderStatus);
     const [loading, setLoading] = useState(false);
@@ -39,7 +39,7 @@ const OrderDetailModal = ({ order, onClose, statusOptions, onStatusChange }) => 
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Tổng tiền</label>
-                            <p className="text-sm text-gray-900 font-semibold">${order.totalPrice}</p>
+                            <p className="text-sm text-gray-900 font-semibold">{formatCurrency(order.totalPrice, "VND")}</p>
                         </div>
                     </div>
 
@@ -80,7 +80,7 @@ const OrderDetailModal = ({ order, onClose, statusOptions, onStatusChange }) => 
                                     <div key={index} className="p-4 flex justify-between items-center">
                                         <div className="flex-1">
                                             <p className="text-sm font-medium text-gray-900">
-                                                {item.product?.productName || 'Product'}
+                                                {item?.productName || 'Product'}
                                             </p>
                                             <p className="text-xs text-gray-500">
                                                 Số lượng: {item.quantity}
@@ -88,7 +88,8 @@ const OrderDetailModal = ({ order, onClose, statusOptions, onStatusChange }) => 
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm font-medium text-gray-900">
-                                                ${item.price}
+                                                {formatCurrency(item.price, "VND")}
+
                                             </p>
                                             <p className="text-xs text-gray-500">
                                                 Tổng: ${(item.price * item.quantity).toFixed(2)}
@@ -113,9 +114,9 @@ const OrderDetailModal = ({ order, onClose, statusOptions, onStatusChange }) => 
                                     <p className="font-medium text-gray-900">
                                         {order.shippingAddress.firstName} {order.shippingAddress.lastName}
                                     </p>
-                                    <p className="text-gray-700">{order.shippingAddress.streetAddress}</p>
+                                    <p className="text-gray-700">Địa chỉ giao hàng : {order.shippingAddress.streetAddress}</p>
                                     <p className="text-gray-700">
-                                        {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                                        Thành phố : {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                                     </p>
                                     <p className="text-gray-700">SĐT: {order.shippingAddress.mobile}</p>
                                 </div>

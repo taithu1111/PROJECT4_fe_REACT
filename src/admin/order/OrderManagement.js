@@ -190,7 +190,7 @@ const OrderManagement = () => {
                                             <td className="px-6 py-4 text-sm text-gray-900">
                                                 {order.user?.email || `User #${order.userId}`}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(order.totalPrice, "$")}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{formatCurrency(order.totalPrice, "VND")}</td>
                                             <td className="px-6 py-4 text-sm">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${status?.color}`}>
                                                     {status?.label}
