@@ -27,14 +27,7 @@ function HomeCategories() {
                 Categories
               </p>
               <p className="font-san text-[#717171] mt-5 text-[18px]">
-                Pellentesque tincidunt tristique neque, eget venenatis enim
-                gravida quis. Fusce at egestas libero. Cras convallis egestas
-                ullamcorper. Suspendisse sed ultricies nisl, pharetra rutrum
-                mauris. Vestibulum at massa dui. Morbi et purus velit.
-              </p>
-              <p className="font-san text-[#717171] mt-5 text-[18px]">
-                Etiam tristique, justo eu condimentum efficitur, purus velit
-                facilisis sem.
+                Explore our wide range of plants, from low-maintenance succulents to vibrant flowering plants. We have something for every corner of your home. Whether you are a seasoned gardener or just starting, our selection is curated to ensure quality and growth.
               </p>
             </div>
           </Grid>
@@ -67,11 +60,10 @@ function HomeCategories() {
         <div className="w-full bg-[#3c3434]">
           <main className="container w-[75%] ml-56 space-y-5 flex flex-col px-8 mt-40 ">
             <h2 className="font-marsf md:text-4xl lg:text-5xl text-white mb-2">
-              We strive to make the best olive produce as verified by tasting
-              experts.
+              We strive to provide the healthiest plants, grown with care and love.
             </h2>
             <p className="text-justify mr-28 font-san text-[18px] text-white">
-              Award-Winning - All Natural - Authentic Olive Oils
+              Sustainably Grown - Hand Picked - Quality Guaranteed
             </p>
           </main>
         </div>

@@ -97,44 +97,21 @@ function Contact() {
               Get in touch!
             </h2>
             <p className="font-san text-[18px] text-[#6c6d6a]">
-              Integer ac interdum lacus. Nunc porta semper lacus a varius.
-              Pellentesque habitant morbi tristique senectus et netus et
-              malesuada fames ac turpis egestas.
+              Have a question about our plants? Need advice on care? Or just want to say hello? We'd love to hear from you.
             </p>
             <p className="font-san text-[18px] text-[#6c6d6a]">
-              Nunc sagittis consectetur velit, ac gravida nunc gravida et.
-              Vestibulum at eros imperdiet, volutpat nunc vitae, ornare erat.
-              Proin interdum aliquet porta. Fusce ut semper ligula.
+              Our team is dedicated to providing the best green friends for your home. Reach out to us via phone, email, or visit our store.
             </p>
             <div className="flex just space-x-32 ">
               <div className="space-y-4 ">
                 <span className="font-san text-[18px]  text-[#6c6d6a]">
                   <PhoneEnabledIcon className="text-orange-500" />
-                  (374)635-9332
+                  (374) 635-9332
                 </span>
                 <div className="flex">
                   <MailOutlineIcon className="text-xs text-orange-500  " />
                   <span className="font-san text-[18px]  text-[#6c6d6a]">
-                    amfissa@example.com
-                  </span>
-                </div>
-                <div className="flex">
-                  <LocationOnIcon className="text-orange-500" />
-                  <span className="font-san text-[18px]  text-[#6c6d6a]">
-                    6705 Main Wood Street, Long Beach, California
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-4 ">
-                <span className="font-san text-[18px]  text-[#6c6d6a]">
-                  <PhoneEnabledIcon className="text-orange-500" />
-                  (374)635-9332
-                </span>
-                <div className="flex">
-                  <MailOutlineIcon className="text-xs text-orange-500  " />
-                  <span className="font-san text-[18px]  text-[#6c6d6a]">
-                    amfissa@example.com
+                    contact@plantnest.com
                   </span>
                 </div>
                 <div className="flex">
@@ -202,7 +179,7 @@ function Contact() {
       </div>
       <div className="w-full h-full">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.740295837024!2d105.84755407600525!3d21.003044988659806!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ac748cd9d447%3A0xaf1371c17f07550c!2zMTkgUC4gTMOqIFRoYW5oIE5naOG7iywgQuG6oWNoIE1haSwgSGFpIELDoCBUcsawbmcsIEjDoCBO4buZaSwgVmlldG5hbQ!5e0!3m2!1sen!2s!4v1691868358495!5m2!1sen!2s"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3312.456789012345!2d-118.193740!3d33.870420!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80dd3353456789ab%3A0x1234567890abcdef!2s6705%20Main%20Wood%20St%2C%20Long%20Beach%2C%20CA!5e0!3m2!1sen!2sus!4v1691868358495!5m2!1sen!2sus"
           width="1900"
           height="450"
           // style="border:0"

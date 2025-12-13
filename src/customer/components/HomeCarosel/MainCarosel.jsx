@@ -31,13 +31,13 @@ const MainCarosel = () => {
         style={{ animation: "slideFromRight 2s forwards" }}
       >
         <h1 className="font-mar text-6xl font-bold text-green-500 mb-2 ml-4">
-          Plant make
+          Plants Make
         </h1>
         <h1 className="font-mar text-6xl font-bold text-green-500 mb-2 ml-4">
-          life better
+          Life Better
         </h1>
         <p className="font-san text-3xl text-green-500 mb-2 ml-4">
-          Find Your Favorite Plants Here.
+          Discover our lush collection of indoor and outdoor plants.
         </p>
         <button
           onClick={() => navigate("/products")}

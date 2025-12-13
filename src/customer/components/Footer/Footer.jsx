@@ -1,10 +1,12 @@
 import { Button, Grid, Link, Typography } from "@mui/material";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import PinterestIcon from "@mui/icons-material/Pinterest";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 
 const Footer = () => {
+  const navigate = useNavigate();
   return (
     <div className="bg-organic font-mar mx-28 text-xl">
       <Grid
@@ -17,7 +19,7 @@ const Footer = () => {
             <div className="float-left">
               <div className="text-left text-2xl mb-3">Get in touch!</div>
               <div className="text-left text-orange-400">
-                example@emxample.com
+                contact@plantnest.com
               </div>
             </div>
 
@@ -35,32 +37,39 @@ const Footer = () => {
   </Typography> */}
           <div className="font-mar text-left mt-14 ml-8">
             <div className="font-marsf text-[24px] mb-2  mr-10">
-              Cxustomer Service
+              Customer Service
             </div>
             <div className="ml-5 text-lg">
               <ul className="list-outside space-y-2  list-disc">
                 <li className="text-orange-500">
-                  <p className=" hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]">
+                  <p
+                    onClick={() => navigate("/about")}
+                    className=" hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]"
+                  >
                     About
                   </p>
                 </li>
                 <li className="text-orange-500">
-                  <p className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]">
+                  <p
+                    onClick={() => navigate("/products")}
+                    className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]"
+                  >
                     Shops
                   </p>
                 </li>
                 <li className="text-orange-500">
-                  <p className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]">
+                  <p
+                    onClick={() => navigate("/")}
+                    className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]"
+                  >
                     Home
                   </p>
                 </li>
                 <li className="text-orange-500">
-                  <p className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]">
-                    Blog
-                  </p>
-                </li>
-                <li className="text-orange-500">
-                  <p className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]">
+                  <p
+                    onClick={() => navigate("/contact")}
+                    className="hover:text-orange-500 transition-all duration-75  cursor-pointer font-san text-[18px] text-[#575757]"
+                  >
                     Contact Us
                   </p>
                 </li>
@@ -83,14 +92,14 @@ const Footer = () => {
           </div>
         </Grid>
       </Grid>
-      <div className="ml-[160px] mt-28 w-full flex items-center">
+      <div className="container mx-auto mt-20 pb-8 flex flex-col md:flex-row items-center justify-between px-4">
         <div className="flex items-center space-x-1">
           <span className="text-2xl font-semibold text-green-500">Plant</span>
           <span className="text-2xl font-semibold text-brown-500">Nest</span>
         </div>
-        <div className="bg-orange-300 h-[2px] w-[65rem] mx-4"></div>
+        <div className="bg-orange-300 h-[2px] flex-grow mx-4 hidden md:block"></div>
         <span className="text-[15px] font-san text-[#757575]">
-          © 2021 Qode Interactive. All Rights Reserved
+          © 2023 PlantNest. All Rights Reserved
         </span>
       </div>
     </div>

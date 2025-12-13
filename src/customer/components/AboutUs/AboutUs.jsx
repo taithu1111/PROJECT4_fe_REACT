@@ -17,9 +17,7 @@ function AboutUs() {
         <div className="flex w-full ml-60  p-20 ">
           <div className="w-full space-y-9">
             <span className="font-marsf text-4xl  text-[28px] ]">
-              Curabitur vulputate arcu odio, ac facilisis diambud accumsan ut.
-              Ut imperdiet et leo in vulputate weed eleifend lacus eu sapien
-              sagittis imperdiet.
+              Bringing the serenity of nature into your home/workspace. We believe that plants are not just decorations, but companions that improve your life.
             </span>
             <img src="https://img.freepik.com/free-photo/beautiful-tree-middle-field-covered-with-grass-with-tree-line-background_181624-29267.jpg" />
           </div>
@@ -29,18 +27,12 @@ function AboutUs() {
             </h2>
             <div className="w-[40%] ">
               <p className="font-san text-[18px] text-[#797979]">
-                Pellentesque tincidunt tristique neque, eget venenatis enim
-                gravida quis. Fusce at egestas libero. Cras convallis egestas
-                ullamcorper. Suspendisse sed ultricies nisl, pharetra rutrum
-                mauris. Vestibulum at massa dui. Morbi et purus.
+                We curate a diverse collection of healthy, thriving plants sourced from sustainable growers. From rare succulents to lush tropicals, we ensure every plant is ready to flourish in its new home.
               </p>
             </div>
             <div className="w-[40%] ">
               <p className="font-san text-[18px] text-[#797979]">
-                Pellentesque tincidunt tristique neque, eget venenatis enim
-                gravida quis. Fusce at egestas libero. Cras convallis egestas
-                ullamcorper. Suspendisse sed ultricies nisl, pharetra rutrum
-                mauris. Vestibulum at massa dui. Morbi et purus.
+                More than just a shop, we are a community of plant lovers. We provide expert care guides, workshops, and ongoing support to help your green friends thrive for years to come.
               </p>
             </div>
           </div>
@@ -54,13 +46,10 @@ function AboutUs() {
           <div className="w-full justify-center text-center bg-[#829067]">
             <main className="container w-[50%] ml-60 space-y-5 flex flex-col items-center justify-center px-8 mt-40 text-center">
               <h2 className="text-justify font-marsf md:text-4xl lg:text-5xl text-white mb-2">
-                The traditional way of harvesting olives is to shake the tree
+                The secret to a happy plant is understanding its needs.
               </h2>
               <p className="text-justify font-san text-[18px] text-[#fff]">
-                The first important step is to collect the olives from the tree.
-                However, if no net is used to catch the olives before they hit
-                the ground, this process can result in bruised olives the
-                crushing of which produces a lower-quality oil.
+                We take the guesswork out of plant parenthood. Our team carefully inspects every leaf and root before it reaches you, ensuring you receive only the healthiest specimens. We believe anyone can grow a green thumb with the right guidance.
               </p>
             </main>
           </div>
@@ -69,7 +58,7 @@ function AboutUs() {
           <div className="flex w-screen h-[35rem] bg-no-repeat bg-cover bg-opacity-25 ml-60 p-9 justify-center">
             <div class="w-[30%] space-y-6 mt-20">
               <h3 class="font-marsf text-4xl text-[34px] text-[#000000] animate-slide-in">
-                “We love what we do, how we do it, and the people involved”
+                “Plants have transformed my living space completely. The quality and care from this team is unmatched.”
               </h3>
               <h1 class="font-meadowbrook text-[30px] text-[#CC723F] animate-slide-in">
                 Daniel K.
@@ -78,24 +67,10 @@ function AboutUs() {
             <div className="w-full ml-36 mr-60 space-y-4">
               <div className="w-[90%] space-y-7">
                 <p className="font-san text-[18px] text-[#797979] mt-20">
-                  Curabitur vulputate arcu odio, ac facilisis diam accumsan ut.
-                  Ut imperdiet et leo in vulputate. Sed eleifend lacus eu sapien
-                  sagittis imperdiet. Etiam tempor mollis augue, ut tincidunt ex
-                  interdum eu. Pellentesque rhoncus lectus sed posuere viverra.
-                  Vestibulum id turpis lectus. Donec rhoncus quis elit sed
-                  fermentum. Nullam sit amet ex enim. Fusce nec suscipit nulla.
-                  Maecenas porta mi vestibulum, lobortis est ac, hendrerit dui.
-                  Curabitur vulputate arcu odio, ac facilisis diam accumsan
-                  imperdiet et leo in vulputate sit dolor.
+                  Our journey began with a simple seed of an idea: to make nature accessible to everyone living in urban environments. We noticed how disconnected city life could feel from the natural world, and we wanted to bridge that gap. What started as a small balcony garden has grown into a passion for sharing the joy of plants with others.
                 </p>
                 <p className="font-san text-[18px] text-[#797979] mt-20">
-                  Sed eleifend lacus eu sapien sagittis imperdiet. Etiam tempor
-                  mollis augue, ut tincidunt ex interdum eu. Pellentesque
-                  rhoncus lectus sed posuere viverra. Vestibulum id turpis
-                  lectus. Donec rhoncus quis elit sed fermentum. Nullam sit amet
-                  ex enim. Fusce nec suscipit nulla. Maecenas porta mi
-                  vestibulum, lobortis est ac, hendrerit dui. Pellentesque
-                  auctor id enim sit amet molestie.
+                  We believe in sustainability and responsible stewardship. That's why we partner with local growers who prioritize eco-friendly practices. Every plant you purchase supports a network of dedicated horticulturists working to make our planet a little greener, one leaf at a time. Join us in growing a better future.
                 </p>
               </div>
             </div>
@@ -105,7 +80,7 @@ function AboutUs() {
         <div class="flex flex-col min-h-screen items-center  justify-center">
           <span className="font-marsf text-[50px]">Meet Our Team</span>
           <p className="font-san text-[18px] text-[#797979]">
-            Etiam facilisis ligula nec velit posuere egestasnc dictum lectus sem
+            Our dedicated team of plant experts is here to help you grow.
           </p>
 
           <div>
@@ -121,7 +96,7 @@ function AboutUs() {
                 <div className="justify-center text-center text-gray-600 space-x-2">
                   <h5 className="font-marsf text-[24px]">Nguyễn Quang Du</h5>
                   <p className="font-san text-[18px] mb-3  text-[#797979]">
-                    Olive Oil Sommelier
+                    Plant Specialist
                   </p>
                   <FacebookRoundedIcon className="hover:text-blue-600" />
                   <InstagramIcon className="hover:text-red-500" />
@@ -140,7 +115,7 @@ function AboutUs() {
                 <div className="justify-center text-center text-gray-600 space-x-2">
                   <h5 className="font-marsf text-[24px]">Phạm Bùi Bình Minh</h5>
                   <p className="font-san text-[18px] mb-3 text-[#797979]">
-                    CO Pinaf Store
+                    Co-Founder
                   </p>
                   <FacebookRoundedIcon className="hover:text-blue-600" />
                   <InstagramIcon className="hover:text-red-500" />
@@ -158,7 +133,7 @@ function AboutUs() {
                 <div className="justify-center text-center text-gray-600 space-x-2">
                   <h5 className="font-marsf text-[24px]">Trịnh Công Nguyên</h5>
                   <p className="font-san text-[18px] mb-3 text-[#797979]">
-                    SE0 Pinaf Store
+                    Marketing Manager
                   </p>
                   <FacebookRoundedIcon className="hover:text-blue-600" />
                   <InstagramIcon className="hover:text-red-500" />
@@ -177,7 +152,7 @@ function AboutUs() {
                 <div className="justify-center text-center text-gray-600 space-x-2">
                   <h5 className="font-marsf text-[24px]">Doãn Việt Quang</h5>
                   <p className="font-san text-[18px] mb-3 text-[#797979]">
-                    Farmer Pinaf Store
+                    Head Gardener
                   </p>
                   <FacebookRoundedIcon className="hover:text-blue-600" />
                   <InstagramIcon className="hover:text-red-500" />
