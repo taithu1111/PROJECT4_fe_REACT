@@ -31,9 +31,14 @@ export default function Product({ handleClick }) {
   const [productsPerPage, setProductsPerPage] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(999999999);
+  const [maxPrice, setMaxPrice] = useState(0);
   const [minPriceInput, setMinPriceInput] = useState("0");
-  const [maxPriceInput, setMaxPriceInput] = useState("999999999");
+  const [maxPriceInput, setMaxPriceInput] = useState("0");
+  const [sliderMaxLimit, setSliderMaxLimit] = useState(100);
+  // Store initial true min/max to allow resetting
+  const [initialMinPrice, setInitialMinPrice] = useState(0);
+  const [initialMaxPrice, setInitialMaxPrice] = useState(0);
+
   const [selectedSort, setSelectedSort] = useState("newest");
   const [searchQuery, setSearchQuery] = useState("");
   const [gridColumns, setGridColumns] = useState(5);
@@ -81,6 +86,39 @@ export default function Product({ handleClick }) {
         const data = await APIProduct.getAllProducts();
         console.log("All products:", data);
         setProducts(data);
+
+        // Calculate dynamic price bounds
+        if (data && data.length > 0) {
+          const prices = data.map(p => p.price);
+          const trueMin = Math.min(...prices);
+          const trueMax = Math.max(...prices);
+
+          setInitialMinPrice(trueMin);
+          setInitialMaxPrice(trueMax);
+          setMinPrice(trueMin);
+          setMaxPrice(trueMax);
+          setMinPriceInput(trueMin.toString());
+          setMaxPriceInput(trueMax.toString());
+
+          // Calculate slider max limit: 10^n >= trueMax
+          // If trueMax is 0, default to 100
+          let limit = 100;
+          if (trueMax > 0) {
+            const power = Math.ceil(Math.log10(trueMax));
+            // If trueMax is exactly a power of 10 e.g. 100, log10 is 2. 10^2=100.
+            // Requirement: 10^n >= max.
+            // If max=90, log10 ~1.95 -> ceil=2 -> 100. OK.
+            // If max=100, log10=2 -> ceil=2 -> 100. OK.
+            // If max=101, log10~2.004 -> ceil=3 -> 1000. OK.
+            limit = Math.pow(10, power);
+
+            // Edge case: if trueMax is very small (e.g. < 10), make sure limit is at least 10 or 100 for better UI?
+            // User requested strict 10^n. 10^1 = 10. If max price is 5, limit 10.
+            if (limit < 10) limit = 10;
+          }
+          setSliderMaxLimit(limit);
+        }
+
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
@@ -219,7 +257,7 @@ export default function Product({ handleClick }) {
       return;
     }
     const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 10000) {
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= sliderMaxLimit) {
       const clampedValue = Math.min(numValue, maxPrice);
       setMinPrice(clampedValue);
       if (clampedValue !== numValue) {
@@ -237,7 +275,7 @@ export default function Product({ handleClick }) {
       return;
     }
     const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 10000) {
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= sliderMaxLimit) {
       const clampedValue = Math.max(numValue, minPrice);
       setMaxPrice(clampedValue);
       if (clampedValue !== numValue) {
@@ -249,10 +287,10 @@ export default function Product({ handleClick }) {
 
   const handleClearFilters = () => {
     setSelectedCategories([]);
-    setMinPrice(0);
-    setMaxPrice(10000);
-    setMinPriceInput("0");
-    setMaxPriceInput("10000");
+    setMinPrice(initialMinPrice);
+    setMaxPrice(initialMaxPrice);
+    setMinPriceInput(initialMinPrice.toString());
+    setMaxPriceInput(initialMaxPrice.toString());
     setSelectedSort("newest");
     setSearchQuery(""); // Clear search query as well
     setCurrentPage(1);
@@ -383,7 +421,7 @@ export default function Product({ handleClick }) {
                           onChange={handleChange}
                           valueLabelDisplay="auto"
                           aria-label="range-slider"
-                          min={0} step={50} max={999999999}
+                          min={0} step={1} max={sliderMaxLimit}
                           sx={{ maxWidth: "250px", width: "250px", color: "#34D399" }}
                         />
                         <div className="flex items-center space-x-2 mt-4">
@@ -392,8 +430,8 @@ export default function Product({ handleClick }) {
                             <input
                               type="number"
                               min="0"
-                              max="10000"
-                              step="50"
+                              max={sliderMaxLimit}
+                              step="1"
                               value={minPriceInput}
                               onChange={handleMinPriceInputChange}
                               onBlur={() => {
@@ -404,9 +442,9 @@ export default function Product({ handleClick }) {
                                 } else if (numValue > maxPrice) {
                                   setMinPriceInput(maxPrice.toString());
                                   setMinPrice(maxPrice);
-                                } else if (numValue > 10000) {
-                                  setMinPriceInput("10000");
-                                  setMinPrice(10000);
+                                } else if (numValue > sliderMaxLimit) {
+                                  setMinPriceInput(sliderMaxLimit.toString());
+                                  setMinPrice(sliderMaxLimit);
                                 } else {
                                   setMinPrice(numValue);
                                 }
@@ -421,15 +459,15 @@ export default function Product({ handleClick }) {
                             <input
                               type="number"
                               min="0"
-                              max="10000"
-                              step="50"
+                              max={sliderMaxLimit}
+                              step="1"
                               value={maxPriceInput}
                               onChange={handleMaxPriceInputChange}
                               onBlur={() => {
-                                const numValue = parseFloat(maxPriceInput) || 10000;
-                                if (numValue > 10000) {
-                                  setMaxPriceInput("10000");
-                                  setMaxPrice(10000);
+                                const numValue = parseFloat(maxPriceInput) || sliderMaxLimit;
+                                if (numValue > sliderMaxLimit) {
+                                  setMaxPriceInput(sliderMaxLimit.toString());
+                                  setMaxPrice(sliderMaxLimit);
                                 } else if (numValue < minPrice) {
                                   setMaxPriceInput(minPrice.toString());
                                   setMaxPrice(minPrice);
@@ -439,7 +477,6 @@ export default function Product({ handleClick }) {
                                 } else {
                                   setMaxPrice(numValue);
                                 }
-                                setCurrentPage(1);
                               }}
                               className="px-2 py-1 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 w-24 text-sm"
                             />

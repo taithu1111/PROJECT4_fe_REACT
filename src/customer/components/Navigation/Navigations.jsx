@@ -80,6 +80,7 @@ export default function Navigation() {
     dispatch(logout());
     localStorage.clear();
     handleCloseUserMenu();
+    navigate("/");
   };
 
   const handleOpenAuth = () => {
@@ -204,6 +205,9 @@ export default function Navigation() {
         {/* Nav Links */}
         <div className="flex space-x-8 text-lg">
           <NavLink to="/" className="hover:text-orange-500">HOME</NavLink>
+          {auth.user?.role === "ROLE_ADMIN" && (
+            <NavLink to="/admin" className="hover:text-orange-500">ADMIN</NavLink>
+          )}
           <NavLink to="/products" className="hover:text-orange-500">SHOPS</NavLink>
           <NavLink to="/about" className="hover:text-orange-500">ABOUT US</NavLink>
           <NavLink to="/contact" className="hover:text-orange-500">CONTACT US</NavLink>

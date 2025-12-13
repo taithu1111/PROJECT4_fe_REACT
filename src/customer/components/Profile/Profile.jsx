@@ -56,7 +56,7 @@ const Profile = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    const phoneRegex = /^[0-9]{10,15}$/;
+    const phoneRegex = /^[0-9]{3,20}$/;
     const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
 
     useEffect(() => {
@@ -119,7 +119,7 @@ const Profile = () => {
         else if (!emailRegex.test(formData.email)) errors.email = "Invalid email format";
 
         if (formData.mobile && !phoneRegex.test(formData.mobile)) {
-            errors.mobile = "Phone must be 10-15 digits"; // CHANGED key to mobile
+            errors.mobile = "Phone must be 3-20 digits"; // CHANGED key to mobile
         }
 
         setFormErrors(errors);
@@ -329,7 +329,7 @@ const Profile = () => {
                             onChange={handleInputChange}
                             disabled={!editMode}
                             error={!!formErrors.mobile}
-                            helperText={formErrors.mobile || "Optional: 10-15 digits"}
+                            helperText={formErrors.mobile || "Optional: 3-20 digits"}
                             InputProps={{ readOnly: !editMode }}
                         />
                     </Grid>

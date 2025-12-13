@@ -34,7 +34,7 @@ const Register = ({ onSwitchMode }) => {
   const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
   // 🔹 Phone regex requirement
-  const phoneRegex = /^[0-9]{10,15}$/;
+  const phoneRegex = /^[0-9]{3,20}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,7 +64,7 @@ const Register = ({ onSwitchMode }) => {
     if (!formData.mobile) {
       validationErrors.mobile = "Phone number is required";
     } else if (!phoneRegex.test(formData.mobile)) {
-      validationErrors.mobile = "Phone must be 10-15 digits";
+      validationErrors.mobile = "Phone must be 3-20 digits";
     }
 
     // 🔹 Address validation
@@ -124,9 +124,9 @@ const Register = ({ onSwitchMode }) => {
   };
 
   return (
-    <div>
+    <div className="max-h-[80vh] overflow-y-auto px-2">
       <ToastContainer />
-      <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "25px" }}>
+      <Typography variant="h5" align="center" gutterBottom style={{ marginBottom: "15px" }}>
         Register
       </Typography>
       <form onSubmit={handleSubmit}>
@@ -157,7 +157,7 @@ const Register = ({ onSwitchMode }) => {
               helperText={errors.lastName}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               required
               id="email"
@@ -171,7 +171,7 @@ const Register = ({ onSwitchMode }) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               required
               id="mobile"
@@ -181,7 +181,7 @@ const Register = ({ onSwitchMode }) => {
               value={formData.mobile}
               onChange={handleInputChange}
               error={!!errors.mobile}
-              helperText={errors.mobile || "10-15 digits"}
+              helperText={errors.mobile || "3-20 digits"}
             />
           </Grid>
 
